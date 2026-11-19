@@ -1,0 +1,3423 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="แดชบอร์ดทะเบียนยามาตรฐานกลาง 350 SKU วิเคราะห์หมวดหมู่ WHO ATC หน่วยนับ และเกณฑ์สั่งซื้อ พร้อมระบบ JSON Sync แบบไม่เลื่อนแนวนอน"
+    />
+    <title>Drug Intelligence | 3-Mode Master Catalog Dashboard</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23006241'/%3E%3Cpath d='M14 8h4v6h6v4h-6v6h-4v-6H8v-4h6z' fill='%23ffffff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./datetime-ui.css" />
+    <style>
+      /* Hallmark · design-system: DESIGN-starbucks.md · critique: P5 H5 E5 S5 R5 V4 */
+      :root {
+        --sb-font-sans: 'Inter', 'Noto Sans Thai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        --sb-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        --sb-green: #006241;
+        --sb-accent: #00754a;
+        --sb-house: #1e3932;
+        --sb-uplift: #2b5148;
+        --sb-green-light: #d4e9e2;
+        --sb-green-tint: rgba(212, 233, 226, 0.33);
+        --sb-gold: #cba258;
+        --sb-gold-light: #dfc49d;
+        --sb-gold-lightest: #faf6ee;
+        --sb-gold-ink: #7a5a1e;
+        --sb-white: #ffffff;
+        --sb-neutral-cool: #f9f9f9;
+        --sb-neutral-warm: #f2f0eb;
+        --sb-ceramic: #edebe9;
+        --sb-black: #000000;
+        --sb-text: rgba(0, 0, 0, 0.87);
+        --sb-text-soft: rgba(0, 0, 0, 0.58);
+        --sb-text-white: #ffffff;
+        --sb-text-white-soft: rgba(255, 255, 255, 0.78);
+        --sb-rewards-green: #33433d;
+        --sb-red: #c82014;
+        --sb-red-tint: rgba(200, 32, 20, 0.08);
+        --sb-yellow: #fbbc05;
+        --sb-yellow-wash: #fdf4d7;
+        --sb-yellow-ink: #735100;
+        --sb-border: #d6dbde;
+        --sb-hairline: #e7e7e7;
+        --sb-backdrop: rgba(0, 0, 0, 0.52);
+        --sb-ink-08: rgba(0, 0, 0, 0.08);
+        --sb-white-14: rgba(255, 255, 255, 0.14);
+        --sb-white-20: rgba(255, 255, 255, 0.2);
+        --sb-white-45: rgba(255, 255, 255, 0.45);
+        --sb-donut-0: #006241;
+        --sb-donut-1: #00754a;
+        --sb-donut-2: #1e3932;
+        --sb-donut-3: #2b5148;
+        --sb-donut-4: #cba258;
+        --sb-donut-5: #5b8779;
+        --sb-donut-6: #82a89c;
+        --sb-donut-7: #a8c5bb;
+        --sb-donut-8: #d4e9e2;
+        --sb-card-radius: 12px;
+        --sb-btn-radius: 50px;
+        --sb-input-radius: 6px;
+        --sb-shadow-card: 0 0 0.5px rgba(0, 0, 0, 0.14), 0 1px 1px rgba(0, 0, 0, 0.24);
+        --sb-shadow-nav: 0 1px 3px rgba(0, 0, 0, 0.1), 0 2px 2px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.07);
+        --sb-shadow-frap: 0 0 6px rgba(0, 0, 0, 0.24), 0 8px 12px rgba(0, 0, 0, 0.14);
+        --sb-shadow-frap-active: 0 0 6px rgba(0, 0, 0, 0.24);
+        --sb-shadow-dialog: 0 12px 32px rgba(0, 0, 0, 0.28);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        overflow-x: clip;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: clip;
+        background: var(--sb-neutral-warm);
+        color: var(--sb-text);
+        font-family: var(--sb-font-sans);
+        font-size: 14px;
+        line-height: 1.5;
+        letter-spacing: -0.01em;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        overflow-wrap: break-word;
+        text-wrap: balance;
+        min-width: 0;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+        letter-spacing: inherit;
+      }
+
+      button {
+        cursor: pointer;
+        border-radius: var(--sb-btn-radius);
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      button:active:not(:disabled) {
+        transform: scale(0.95);
+      }
+
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible,
+      .table-container:focus-visible {
+        outline: 2px solid var(--sb-accent);
+        outline-offset: 2px;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .tabular {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .hide {
+        display: none !important;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      /* Global Navigation */
+      .global-nav {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: var(--sb-white);
+        box-shadow: var(--sb-shadow-nav);
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-inner {
+        width: 100%;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .brand-emblem {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--sb-green);
+        color: var(--sb-white);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+
+      .brand-copy {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .brand-kicker {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--sb-green);
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .brand-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--sb-text);
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        align-self: stretch;
+      }
+
+      .nav-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 4px 2px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--sb-text-soft);
+        transition: color 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .nav-link:hover {
+        color: var(--sb-green);
+      }
+
+      .nav-link.active {
+        color: var(--sb-green);
+        font-weight: 700;
+      }
+
+      .nav-link.active::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -4px;
+        height: 3px;
+        background: var(--sb-green);
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .nav-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: var(--sb-btn-radius);
+        background: var(--sb-ceramic);
+        color: var(--sb-text-soft);
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .nav-chip strong {
+        color: var(--sb-text);
+        font-weight: 700;
+      }
+
+      .mobile-menu-btn {
+        display: none;
+        padding: 7px 14px;
+        min-height: 38px;
+        background: var(--sb-white);
+        color: var(--sb-text);
+        border: 1px solid var(--sb-border);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .mobile-drawer {
+        display: none;
+        background: var(--sb-neutral-cool);
+        border-top: 1px solid var(--sb-hairline);
+        padding: 12px 16px 16px;
+        box-shadow: var(--sb-shadow-card);
+      }
+
+      .mobile-drawer.open {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .mobile-drawer a {
+        padding: 10px 14px;
+        border-radius: var(--sb-btn-radius);
+        font-weight: 600;
+        color: var(--sb-text);
+        background: var(--sb-white);
+        border: 1px solid var(--sb-hairline);
+      }
+
+      .mobile-drawer a.active {
+        background: var(--sb-green);
+        color: var(--sb-white);
+        border-color: var(--sb-green);
+      }
+
+      /* Starbucks Pill Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 16px;
+        min-height: 38px;
+        border-radius: var(--sb-btn-radius);
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.2;
+        border: 1px solid var(--sb-border);
+        background: var(--sb-white);
+        color: var(--sb-text);
+        white-space: nowrap;
+      }
+
+      .btn:hover:not(:disabled) {
+        background: var(--sb-neutral-cool);
+      }
+
+      .btn-primary {
+        background: var(--sb-accent);
+        color: var(--sb-white);
+        border-color: var(--sb-accent);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: var(--sb-green);
+        border-color: var(--sb-green);
+      }
+
+      .btn-outline-green {
+        background: transparent;
+        color: var(--sb-accent);
+        border-color: var(--sb-accent);
+      }
+
+      .btn-outline-green:hover:not(:disabled) {
+        background: var(--sb-green-light);
+        color: var(--sb-house);
+      }
+
+      .btn-outline-dark {
+        background: transparent;
+        color: var(--sb-text);
+        border-color: var(--sb-text);
+      }
+
+      .btn-outline-dark:hover:not(:disabled) {
+        background: var(--sb-ceramic);
+      }
+
+      .btn-inverted {
+        background: var(--sb-white);
+        color: var(--sb-accent);
+        border-color: var(--sb-white);
+      }
+
+      .btn-inverted:hover:not(:disabled) {
+        background: var(--sb-neutral-warm);
+      }
+
+      .btn-outline-white {
+        background: transparent;
+        color: var(--sb-white);
+        border-color: var(--sb-white);
+      }
+
+      .btn-outline-white:hover:not(:disabled) {
+        background: var(--sb-white-14);
+      }
+
+      .btn-sm {
+        padding: 6px 13px;
+        min-height: 32px;
+        font-size: 13px;
+      }
+
+      /* House Green Hero Band */
+      .hero-band {
+        background: var(--sb-house);
+        color: var(--sb-text-white);
+        padding: 28px 16px;
+      }
+
+      .hero-inner {
+        max-width: 1440px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+        gap: 24px;
+        align-items: center;
+      }
+
+      .gold-ceremony-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 14px;
+        border-radius: var(--sb-btn-radius);
+        border: 1px solid var(--sb-gold);
+        color: var(--sb-gold);
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .hero-title {
+        margin: 0 0 10px;
+        font-size: clamp(24px, 3vw, 36px);
+        font-weight: 700;
+        line-height: 1.22;
+        letter-spacing: -0.01em;
+        color: var(--sb-text-white);
+      }
+
+      .hero-sub {
+        margin: 0 0 18px;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--sb-text-white-soft);
+        max-width: 660px;
+      }
+
+      .mode-switch {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .mode-btn {
+        padding: 9px 18px;
+        min-height: 40px;
+        border-radius: var(--sb-btn-radius);
+        border: 1px solid var(--sb-white-45);
+        background: transparent;
+        color: var(--sb-white);
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .mode-btn:hover {
+        background: var(--sb-white-14);
+      }
+
+      .mode-btn.active {
+        background: var(--sb-white);
+        color: var(--sb-accent);
+        border-color: var(--sb-white);
+        font-weight: 700;
+      }
+
+      .hero-scope-card {
+        background: var(--sb-uplift);
+        color: var(--sb-text-white);
+        border-radius: var(--sb-card-radius);
+        padding: 18px 20px;
+        border: 1px solid var(--sb-white-14);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .scope-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--sb-white-14);
+        flex-wrap: wrap;
+      }
+
+      .scope-eyebrow {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--sb-gold);
+        margin-bottom: 4px;
+      }
+
+      .scope-stats {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--sb-text-white);
+      }
+
+      .scope-badge {
+        background: var(--sb-house);
+        color: var(--sb-green-light);
+        padding: 4px 10px;
+        border-radius: var(--sb-btn-radius);
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .coverage-note {
+        margin: 0;
+        font-size: 13px;
+        color: var(--sb-text-white-soft);
+        line-height: 1.5;
+      }
+
+      .coverage-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      /* Main Content */
+      .container {
+        width: 100%;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+        flex: 1;
+      }
+
+      .status-banner {
+        background: var(--sb-white);
+        border-radius: var(--sb-card-radius);
+        box-shadow: var(--sb-shadow-card);
+        padding: 18px 20px;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      .status-banner.error {
+        background: var(--sb-red-tint);
+        border: 1px solid var(--sb-red);
+        color: var(--sb-red);
+        font-weight: 600;
+      }
+
+      .sync-toast {
+        background: var(--sb-green-light);
+        color: var(--sb-house);
+        border: 1px solid var(--sb-accent);
+        border-radius: var(--sb-card-radius);
+        padding: 10px 16px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .mode-desc-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 16px;
+        color: var(--sb-text-soft);
+        font-size: 14px;
+      }
+
+      /* 5 KPI Cards */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .kpi-card {
+        background: var(--sb-white);
+        border-radius: var(--sb-card-radius);
+        box-shadow: var(--sb-shadow-card);
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 126px;
+        border: 1px solid var(--sb-hairline);
+        border-top: 3px solid var(--sb-green);
+      }
+
+      .kpi-card.gold {
+        border-top-color: var(--sb-gold);
+      }
+
+      .kpi-card.warn {
+        border-top-color: var(--sb-yellow);
+      }
+
+      .kpi-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--sb-text-soft);
+        margin-bottom: 8px;
+      }
+
+      .kpi-value {
+        font-size: clamp(24px, 2.4vw, 32px);
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        color: var(--sb-green);
+        margin-bottom: 8px;
+      }
+
+      .kpi-card.gold .kpi-value {
+        color: var(--sb-gold-ink);
+      }
+
+      .kpi-card.warn .kpi-value {
+        color: var(--sb-yellow-ink);
+      }
+
+      .kpi-foot {
+        padding-top: 8px;
+        border-top: 1px solid var(--sb-hairline);
+        font-size: 12px;
+        color: var(--sb-text-soft);
+      }
+
+      /* Layout Cards */
+      .layout-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .card {
+        background: var(--sb-white);
+        border-radius: var(--sb-card-radius);
+        box-shadow: var(--sb-shadow-card);
+        padding: 20px 22px;
+        min-width: 0;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .card-head-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .card-title-h1 {
+        margin: 0 0 2px;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+        color: var(--sb-green);
+      }
+
+      .card-title-h2 {
+        margin: 0 0 2px;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+        color: var(--sb-text);
+      }
+
+      .card-sub {
+        margin: 0;
+        font-size: 13px;
+        color: var(--sb-text-soft);
+      }
+
+      .pill-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        border-radius: var(--sb-btn-radius);
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--sb-ceramic);
+        color: var(--sb-text);
+        white-space: nowrap;
+      }
+
+      .pill-tag.mint {
+        background: var(--sb-green-light);
+        color: var(--sb-house);
+      }
+
+      .pill-tag.gold {
+        background: var(--sb-gold-lightest);
+        border: 1px solid var(--sb-gold);
+        color: var(--sb-gold-ink);
+      }
+
+      /* Interactive Bars */
+      .bars-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 410px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .bar-btn {
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(140px, 230px) minmax(0, 1fr) minmax(62px, 78px);
+        align-items: center;
+        gap: 10px;
+        padding: 6px 8px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        text-align: left;
+      }
+
+      .bar-btn:hover {
+        background: var(--sb-neutral-warm);
+        border-color: var(--sb-hairline);
+      }
+
+      .bar-btn.active {
+        background: var(--sb-green-tint);
+        border-color: var(--sb-accent);
+      }
+
+      .bar-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--sb-text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .bar-track {
+        height: 10px;
+        border-radius: 50px;
+        background: var(--sb-ceramic);
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        border-radius: 50px;
+        background: var(--sb-accent);
+      }
+
+      .bar-val {
+        text-align: right;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--sb-green);
+        white-space: nowrap;
+      }
+
+      /* Solid SVG Donut */
+      .donut-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .donut-box {
+        position: relative;
+        width: 196px;
+        height: 196px;
+        display: grid;
+        place-items: center;
+      }
+
+      .donut-svg {
+        transform: rotate(-90deg);
+      }
+
+      .donut-center {
+        position: absolute;
+        text-align: center;
+        pointer-events: none;
+      }
+
+      .donut-center b {
+        display: block;
+        font-size: 30px;
+        line-height: 1.1;
+        color: var(--sb-green);
+      }
+
+      .donut-center span {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--sb-text-soft);
+      }
+
+      .legend-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .legend-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--sb-hairline);
+        background: var(--sb-neutral-cool);
+        font-size: 12px;
+        text-align: left;
+      }
+
+      .legend-btn:hover {
+        border-color: var(--sb-accent);
+        background: var(--sb-white);
+      }
+
+      .legend-btn.active {
+        background: var(--sb-green-tint);
+        border-color: var(--sb-accent);
+      }
+
+      .legend-swatch {
+        width: 11px;
+        height: 11px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+
+      .donut-c0 { stroke: var(--sb-donut-0); background-color: var(--sb-donut-0); }
+      .donut-c1 { stroke: var(--sb-donut-1); background-color: var(--sb-donut-1); }
+      .donut-c2 { stroke: var(--sb-donut-2); background-color: var(--sb-donut-2); }
+      .donut-c3 { stroke: var(--sb-donut-3); background-color: var(--sb-donut-3); }
+      .donut-c4 { stroke: var(--sb-donut-4); background-color: var(--sb-donut-4); }
+      .donut-c5 { stroke: var(--sb-donut-5); background-color: var(--sb-donut-5); }
+      .donut-c6 { stroke: var(--sb-donut-6); background-color: var(--sb-donut-6); }
+      .donut-c7 { stroke: var(--sb-donut-7); background-color: var(--sb-donut-7); }
+      .donut-c8 { stroke: var(--sb-donut-8); background-color: var(--sb-donut-8); }
+
+      .legend-btn strong {
+        margin-left: auto;
+        color: var(--sb-green);
+      }
+
+      .info-wash {
+        background: var(--sb-neutral-warm);
+        border: 1px solid var(--sb-hairline);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 12px;
+        color: var(--sb-rewards-green);
+        margin-top: 14px;
+      }
+
+      .detail-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 360px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .repeat-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--sb-hairline);
+        background: var(--sb-neutral-cool);
+        text-align: left;
+      }
+
+      .repeat-btn:hover {
+        border-color: var(--sb-accent);
+        background: var(--sb-white);
+      }
+
+      .repeat-btn strong {
+        display: block;
+        font-size: 14px;
+        color: var(--sb-text);
+      }
+
+      .repeat-btn small {
+        display: block;
+        font-size: 12px;
+        color: var(--sb-text-soft);
+      }
+
+      /* Filter Toolbar */
+      .filter-toolbar {
+        background: var(--sb-ceramic);
+        border-radius: var(--sb-card-radius);
+        padding: 16px 18px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .filter-row {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        align-items: end;
+      }
+
+      .filter-top-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      .field.search-field {
+        flex: 1 1 320px;
+      }
+
+      .field label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--sb-text-soft);
+      }
+
+      .input,
+      .select,
+      .textarea {
+        width: 100%;
+        padding: 0 12px;
+        background: var(--sb-white);
+        color: var(--sb-text);
+        border: 1px solid var(--sb-border);
+        border-radius: var(--sb-input-radius);
+        font-size: 14px;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+      }
+
+      .input,
+      .select {
+        height: 40px;
+      }
+
+      .textarea {
+        padding: 10px 12px;
+        min-height: 120px;
+        resize: vertical;
+        font-family: var(--sb-font-mono);
+        font-size: 12px;
+      }
+
+      .input:focus,
+      .select:focus,
+      .textarea:focus {
+        border-color: var(--sb-accent);
+        outline: none;
+      }
+
+      .input.is-filtered,
+      .select.is-filtered {
+        background: var(--sb-green-tint);
+        border-color: var(--sb-accent);
+      }
+
+      .chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .filter-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 13px;
+        min-height: 36px;
+        white-space: nowrap;
+        background: var(--sb-white);
+        color: var(--sb-text);
+        border: 1px solid var(--sb-border);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .filter-pill:hover {
+        border-color: var(--sb-accent);
+      }
+
+      .filter-pill.active {
+        background: var(--sb-house);
+        color: var(--sb-white);
+        border-color: var(--sb-house);
+      }
+
+      .active-chips-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 8px;
+        border-top: 1px solid var(--sb-ink-08);
+      }
+
+      .active-chips {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .active-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: var(--sb-btn-radius);
+        background: var(--sb-green-light);
+        color: var(--sb-house);
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid var(--sb-accent);
+      }
+
+      .active-chip button {
+        border: 0;
+        background: transparent;
+        color: var(--sb-house);
+        padding: 0 2px;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      /* ZERO-HORIZONTAL-SCROLL RESPONSIVE TABLES */
+      .table-container {
+        container-type: inline-size;
+        max-inline-size: 100%;
+        border: 1px solid var(--sb-hairline);
+        border-radius: 10px;
+        background: var(--sb-white);
+        overflow: clip;
+      }
+
+      .table-scroll-policy {
+        max-height: 410px;
+        overflow-y: auto;
+        overflow-x: clip;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: 13px;
+        white-space: normal;
+        overflow-wrap: break-word;
+      }
+
+      th,
+      td {
+        padding: 11px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--sb-hairline);
+        vertical-align: top;
+        min-width: 0;
+      }
+
+      thead th {
+        background: var(--sb-neutral-cool);
+        color: var(--sb-text-soft);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      tbody th[scope='row'] {
+        font-weight: 600;
+        color: var(--sb-text);
+      }
+
+      th.num,
+      td.num {
+        text-align: right;
+      }
+
+      tbody tr:last-child th,
+      tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      tbody tr.clickable-row {
+        cursor: pointer;
+      }
+
+      tbody tr:hover {
+        background: var(--sb-neutral-warm);
+      }
+
+      .tbl-catalog col.c1 { width: 26%; }
+      .tbl-catalog col.c2 { width: 18%; }
+      .tbl-catalog col.c3 { width: 19%; }
+      .tbl-catalog col.c4 { width: 10%; }
+      .tbl-catalog col.c5 { width: 11%; }
+      .tbl-catalog col.c6 { width: 16%; }
+
+      .tbl-policy col.c1 { width: 38%; }
+      .tbl-policy col.c2 { width: 24%; }
+      .tbl-policy col.c3 { width: 16%; }
+      .tbl-policy col.c4 { width: 22%; }
+
+      .tbl-catalog {
+        --label-2: 'รูปแบบและหน่วยนับ';
+        --label-3: 'หมวดหมู่ยา';
+        --label-4: 'รหัส ATC';
+        --label-5: 'เกณฑ์สั่งซื้อ';
+        --label-6: 'สถานะสต็อก';
+      }
+
+      .tbl-policy {
+        --label-2: 'ความแรง';
+        --label-3: 'หน่วยนับ';
+        --label-4: 'เกณฑ์สั่งซื้อใหม่';
+      }
+
+      .tbl-modal-lots {
+        --label-2: 'Lot';
+        --label-3: 'คงเหลือ';
+        --label-4: 'หมดอายุ';
+        --label-5: 'สถานะ';
+      }
+
+      @container (width < 820px) {
+        .table-container.wide-table {
+          border: 0;
+          background: transparent;
+        }
+
+        .wide-table table,
+        .wide-table thead,
+        .wide-table tbody,
+        .wide-table tr,
+        .wide-table th,
+        .wide-table td {
+          display: block;
+          width: 100%;
+        }
+
+        .wide-table thead {
+          display: none;
+        }
+
+        .wide-table tbody tr {
+          background: var(--sb-white);
+          border: 1px solid var(--sb-hairline);
+          border-radius: 10px;
+          padding: 12px 14px;
+          margin-bottom: 10px;
+        }
+
+        .wide-table tbody tr:last-child {
+          margin-bottom: 0;
+        }
+
+        .wide-table tbody th[scope='row'] {
+          padding: 0 0 8px;
+          margin-bottom: 6px;
+          border-bottom: 1px solid var(--sb-hairline);
+        }
+
+        .wide-table tbody td {
+          display: grid;
+          grid-template-columns: minmax(112px, 40%) minmax(0, 1fr);
+          gap: 6px 12px;
+          align-items: start;
+          padding: 8px 0;
+          text-align: left;
+          border-bottom: 1px solid var(--sb-ceramic);
+        }
+
+        .wide-table tbody td:last-child {
+          border-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        .wide-table tbody td::before {
+          grid-column: 1;
+          grid-row: 1;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--sb-text-soft);
+        }
+
+        .wide-table tbody td > * {
+          grid-column: 2;
+          min-width: 0;
+        }
+
+        .wide-table tbody td:nth-child(2)::before { content: var(--label-2); }
+        .wide-table tbody td:nth-child(3)::before { content: var(--label-3); }
+        .wide-table tbody td:nth-child(4)::before { content: var(--label-4); }
+        .wide-table tbody td:nth-child(5)::before { content: var(--label-5); }
+        .wide-table tbody td:nth-child(6)::before { content: var(--label-6); }
+      }
+
+      @container (width < 540px) {
+        .table-container.compact-table {
+          border: 0;
+          background: transparent;
+        }
+
+        .compact-table table,
+        .compact-table thead,
+        .compact-table tbody,
+        .compact-table tr,
+        .compact-table th,
+        .compact-table td {
+          display: block;
+          width: 100%;
+        }
+
+        .compact-table thead {
+          display: none;
+        }
+
+        .compact-table tbody tr {
+          background: var(--sb-white);
+          border: 1px solid var(--sb-hairline);
+          border-radius: 10px;
+          padding: 12px 14px;
+          margin-bottom: 10px;
+        }
+
+        .compact-table tbody tr:last-child {
+          margin-bottom: 0;
+        }
+
+        .compact-table tbody th[scope='row'] {
+          padding: 0 0 8px;
+          margin-bottom: 6px;
+          border-bottom: 1px solid var(--sb-hairline);
+        }
+
+        .compact-table tbody td {
+          display: grid;
+          grid-template-columns: minmax(104px, 40%) minmax(0, 1fr);
+          gap: 6px 12px;
+          align-items: start;
+          padding: 8px 0;
+          text-align: left;
+          border-bottom: 1px solid var(--sb-ceramic);
+        }
+
+        .compact-table tbody td:last-child {
+          border-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        .compact-table tbody td::before {
+          grid-column: 1;
+          grid-row: 1;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--sb-text-soft);
+        }
+
+        .compact-table tbody td > * {
+          grid-column: 2;
+          min-width: 0;
+        }
+
+        .compact-table tbody td:nth-child(2)::before { content: var(--label-2); }
+        .compact-table tbody td:nth-child(3)::before { content: var(--label-3); }
+        .compact-table tbody td:nth-child(4)::before { content: var(--label-4); }
+        .compact-table tbody td:nth-child(5)::before { content: var(--label-5); }
+      }
+
+      .cell-val {
+        display: block;
+        min-width: 0;
+      }
+
+      .sku-btn {
+        border: 0;
+        background: transparent;
+        padding: 0;
+        text-align: left;
+        border-radius: 4px;
+        color: var(--sb-green);
+        font-weight: 700;
+        font-size: 13px;
+      }
+
+      .sku-btn:hover {
+        text-decoration: underline;
+      }
+
+      .cell-main {
+        display: block;
+        font-weight: 600;
+        color: var(--sb-text);
+      }
+
+      .cell-sub {
+        display: block;
+        font-size: 12px;
+        color: var(--sb-text-soft);
+        font-weight: 400;
+      }
+
+      .mono {
+        font-family: var(--sb-font-mono);
+        font-size: 12px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: var(--sb-btn-radius);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .badge.good {
+        background: var(--sb-green-light);
+        color: var(--sb-house);
+      }
+
+      .badge.warn {
+        background: var(--sb-yellow-wash);
+        color: var(--sb-yellow-ink);
+      }
+
+      .badge.bad {
+        background: var(--sb-red-tint);
+        color: var(--sb-red);
+      }
+
+      .badge.neutral {
+        background: var(--sb-ceramic);
+        color: var(--sb-text-soft);
+      }
+
+      .empty {
+        padding: 32px 20px;
+        text-align: center;
+        color: var(--sb-text-soft);
+        font-size: 14px;
+      }
+
+      .pager {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 14px;
+        font-size: 13px;
+        color: var(--sb-text-soft);
+      }
+
+      .pager-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .pager select {
+        height: 34px;
+        padding: 0 8px;
+        border: 1px solid var(--sb-border);
+        border-radius: var(--sb-input-radius);
+        background: var(--sb-white);
+        color: var(--sb-text);
+        font-size: 13px;
+      }
+
+      /* Frap Floating Button */
+      .frap-fab {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 45;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 0;
+        background: var(--sb-accent);
+        color: var(--sb-white);
+        box-shadow: var(--sb-shadow-frap);
+        display: grid;
+        place-items: center;
+      }
+
+      .frap-fab::after {
+        content: '';
+        position: absolute;
+        inset: -0.8rem;
+      }
+
+      .frap-fab:hover {
+        background: var(--sb-green);
+      }
+
+      .frap-fab:active {
+        transform: scale(0.95);
+        box-shadow: var(--sb-shadow-frap-active);
+      }
+
+      /* Native <dialog> Modals */
+      dialog.sb-dialog {
+        width: min(820px, calc(100% - 24px));
+        max-height: 88vh;
+        border: 0;
+        border-radius: var(--sb-card-radius);
+        background: var(--sb-white);
+        color: var(--sb-text);
+        box-shadow: var(--sb-shadow-dialog);
+        padding: 0;
+        overflow: hidden;
+      }
+
+      dialog.sb-dialog[open] {
+        display: flex;
+        flex-direction: column;
+      }
+
+      dialog.sb-dialog:modal {
+        overscroll-behavior: contain;
+      }
+
+      dialog.sb-dialog::backdrop {
+        background: var(--sb-backdrop);
+        overflow: hidden;
+        overscroll-behavior: contain;
+      }
+
+      .dialog-scroll {
+        padding: 22px 24px;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .modal-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--sb-hairline);
+        margin-bottom: 16px;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--sb-green);
+      }
+
+      .modal-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin: 14px 0;
+      }
+
+      .modal-meta-box {
+        background: var(--sb-neutral-warm);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+
+      .modal-meta-box small {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--sb-text-soft);
+      }
+
+      .modal-meta-box strong {
+        font-size: 14px;
+        color: var(--sb-text);
+      }
+
+      .gold-callout {
+        background: var(--sb-gold-lightest);
+        border: 1px solid var(--sb-gold);
+        border-radius: 10px;
+        padding: 12px 14px;
+        color: var(--sb-gold-ink);
+        font-size: 13px;
+        margin-top: 14px;
+      }
+
+      /* Sync Modal */
+      .sync-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .drop-zone {
+        border: 2px dashed var(--sb-border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        background: var(--sb-neutral-cool);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .drop-zone.dragover {
+        border-color: var(--sb-accent);
+        background: var(--sb-green-tint);
+      }
+
+      .diff-box {
+        border-radius: 10px;
+        padding: 12px 14px;
+        background: var(--sb-neutral-warm);
+        border: 1px solid var(--sb-border);
+        font-size: 13px;
+        margin: 12px 0;
+      }
+
+      .diff-box.valid {
+        background: var(--sb-green-tint);
+        border-color: var(--sb-accent);
+      }
+
+      .diff-box.error {
+        background: var(--sb-red-tint);
+        border-color: var(--sb-red);
+        color: var(--sb-red);
+      }
+
+      .sync-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 210px;
+        overflow-y: auto;
+      }
+
+      .history-item {
+        padding: 9px 12px;
+        border-radius: 8px;
+        background: var(--sb-neutral-cool);
+        border: 1px solid var(--sb-hairline);
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      /* Footer */
+      .site-footer {
+        background: var(--sb-house);
+        color: var(--sb-text-white);
+        padding: 28px 16px 36px;
+        border-top: 3px solid var(--sb-gold);
+      }
+
+      .footer-inner {
+        max-width: 1440px;
+        margin: 0 auto;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .footer-brand {
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--sb-gold);
+        margin-bottom: 6px;
+      }
+
+      .footer-copy {
+        margin: 0;
+        font-size: 13px;
+        color: var(--sb-text-white-soft);
+        line-height: 1.6;
+      }
+
+      @media (min-width: 480px) {
+        .global-nav {
+          min-height: 72px;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .global-nav {
+          min-height: 83px;
+        }
+        .nav-inner,
+        .hero-band,
+        .container,
+        .site-footer {
+          padding-left: 24px;
+          padding-right: 24px;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .global-nav {
+          min-height: 92px;
+        }
+        .nav-inner,
+        .hero-band,
+        .container,
+        .site-footer {
+          padding-left: 40px;
+          padding-right: 40px;
+        }
+      }
+
+      @media (max-width: 1180px) {
+        .filter-row {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 1120px) {
+        .nav-links,
+        .nav-chip,
+        #focusCatalogBtn,
+        #quickSyncBtn {
+          display: none;
+        }
+        .mobile-menu-btn {
+          display: inline-flex;
+        }
+      }
+
+      @media (max-width: 1050px) {
+        .kpi-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .layout-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .hero-inner {
+          grid-template-columns: 1fr;
+        }
+        .modal-meta-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 767px) {
+        .brand-title {
+          font-size: 14px;
+        }
+        .kpi-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .filter-row {
+          grid-template-columns: 1fr;
+        }
+        .bar-btn {
+          grid-template-columns: minmax(108px, 145px) minmax(0, 1fr) minmax(56px, 64px);
+        }
+        .legend-grid,
+        .sync-form-grid {
+          grid-template-columns: 1fr;
+        }
+        .card {
+          padding: 16px;
+        }
+        .frap-fab {
+          right: 16px;
+          bottom: 16px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="global-nav">
+      <div class="nav-inner">
+        <div class="brand">
+          <span class="brand-emblem" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 10.5h-5.5V5a1.5 1.5 0 0 0-3 0v5.5H5a1.5 1.5 0 0 0 0 3h5.5V19a1.5 1.5 0 0 0 3 0v-5.5H19a1.5 1.5 0 0 0 0-3Z" />
+            </svg>
+          </span>
+          <div class="brand-copy">
+            <span class="brand-kicker">Pharmacy Control · Starbucks Design</span>
+            <span class="brand-title">Drug Master Intelligence</span>
+          </div>
+        </div>
+
+        <nav class="nav-links" aria-label="เมนูหลัก">
+          <a class="nav-link" href="./index.html">Inventory Dashboard</a>
+          <a class="nav-link active" href="./drug_dashboard.html" aria-current="page">
+            Drug Dashboard (350 SKU)
+          </a>
+        </nav>
+
+        <div class="nav-actions">
+          <span class="nav-clock-chip tabular" id="navClockChip" aria-live="off"></span>
+          <span class="nav-chip">
+            <strong id="fileMeta" class="tabular">Loading…</strong>
+          </span>
+          <button type="button" class="btn btn-outline-green btn-sm" id="quickSyncBtn">
+            ซิงก์ล่าสุด
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" id="openSyncBtn">
+            อัปเดต JSON
+          </button>
+          <button type="button" class="btn btn-outline-dark btn-sm" id="focusCatalogBtn">
+            ค้นหายาในทะเบียน
+          </button>
+          <button
+            type="button"
+            class="mobile-menu-btn"
+            id="mobileMenuBtn"
+            aria-expanded="false"
+            aria-controls="mobileDrawer"
+          >
+            เมนู
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mobile-drawer" id="mobileDrawer">
+      <a href="./index.html">Inventory Dashboard</a>
+      <a class="active" href="./drug_dashboard.html" aria-current="page">
+        Drug Dashboard (350 SKU)
+      </a>
+      <button type="button" class="btn btn-primary" id="openSyncMobile">
+        อัปเดตและซิงก์ JSON
+      </button>
+      <button type="button" class="btn btn-outline-green" id="quickSyncMobile">
+        ซิงก์ล่าสุดจาก disk
+      </button>
+    </div>
+
+    <section class="hero-band">
+      <div class="hero-inner">
+        <div>
+          <div class="gold-ceremony-pill">
+            <span id="heroVersionPill">WHO ATC 2026 · Master Data</span>
+          </div>
+          <h1 class="hero-title">Drug Intelligence &amp; Master Catalog</h1>
+          <p class="hero-sub" id="heroSubtitle">
+            กำลังโหลดทะเบียนยามาตรฐานกลางจาก data/drugs_update.json …
+          </p>
+          <nav class="mode-switch" aria-label="เลือกโหมดแดชบอร์ด">
+            <button type="button" class="mode-btn active" data-mode="overview" aria-pressed="true">
+              Drug Overview
+            </button>
+            <button type="button" class="mode-btn" data-mode="inventory" aria-pressed="false">
+              Inventory Planning
+            </button>
+            <button type="button" class="mode-btn" data-mode="explorer" aria-pressed="false">
+              Drug Explorer
+            </button>
+          </nav>
+        </div>
+
+        <aside class="hero-scope-card" aria-label="ความครอบคลุมข้อมูลสต็อกและซิงก์">
+          <div class="scope-head">
+            <div>
+              <div class="scope-eyebrow">Catalog vs Stock Coverage &amp; Sync</div>
+              <div class="scope-stats tabular" id="coverageSummary">กำลังตรวจสอบ…</div>
+            </div>
+            <span class="scope-badge" id="catalogUpdatedBadge">Master v2.0</span>
+          </div>
+          <div id="heroTimeTicker"></div>
+          <p class="coverage-note" id="coverageNote">
+            ทะเบียนยาใช้เป็นฐานข้อมูลอ้างอิง · รายการที่ยังไม่มีบันทึกใน stock.json จะไม่ถูกตีความว่าเป็น 0 อัตโนมัติ
+          </p>
+          <div class="coverage-actions">
+            <button type="button" class="btn btn-inverted btn-sm" data-cov-jump="stocked">
+              ดู SKU ที่มีสต็อก
+            </button>
+            <button type="button" class="btn btn-outline-white btn-sm" data-cov-jump="unstocked">
+              ดูที่ยังไม่มีบันทึกสต็อก
+            </button>
+            <button type="button" class="btn btn-outline-white btn-sm" data-cov-jump="">
+              ทั้งหมด
+            </button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <main class="container">
+      <div id="syncToast" class="sync-toast hide" role="status" aria-live="polite">
+        <span id="syncToastText"></span>
+        <button type="button" class="btn btn-outline-dark btn-sm" id="dismissSyncToast">ปิด</button>
+      </div>
+
+      <div id="errorBanner" class="status-banner error hide" role="alert"></div>
+
+      <div class="mode-desc-bar">
+        <span id="modeDesc"></span>
+        <span class="pill-tag gold" id="heroSyncStatusTag">คลิกที่กราฟหรือแถวยาเพื่อกรองและดูรายละเอียด</span>
+      </div>
+
+      <section class="kpi-grid" id="kpis" aria-label="ตัวชี้วัดทะเบียนยา"></section>
+
+      <!-- MODE 1: OVERVIEW -->
+      <section id="overview" class="layout-grid mode-body">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title-h1">การกระจายรายการยาตามหมวดหมู่</h2>
+              <p class="card-sub">คลิกที่หมวดหมู่เพื่อกรองตารางทะเบียนยาด้านล่าง</p>
+            </div>
+            <span class="pill-tag mint" id="catDistPill">16 Categories</span>
+          </div>
+          <div id="overviewBars"></div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title-h2">สัดส่วนหน่วยนับยา</h2>
+              <p class="card-sub">คลิกหน่วยนับในตำนานเพื่อกรองตารางทะเบียนยา</p>
+            </div>
+            <span class="pill-tag" id="unitDistPill">9 Units</span>
+          </div>
+          <div id="overviewDonut" class="donut-wrap"></div>
+          <div class="info-wash">
+            ยาเม็ดและแคปซูลเป็นจำนวน SKU ในทะเบียน ไม่ใช่จำนวนเม็ดคงคลังหรือยอดขายจริง
+          </div>
+        </article>
+      </section>
+
+      <!-- MODE 2: INVENTORY PLANNING -->
+      <section id="inventory" class="layout-grid mode-body hide">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title-h1">ตารางเกณฑ์สั่งซื้อใหม่ราย SKU</h2>
+              <p class="card-sub">แสดงเกณฑ์ตามหน่วยนับของแต่ละรายการ ไม่ใช่สต็อกคงเหลือ</p>
+            </div>
+            <span class="pill-tag mint tabular" id="policyCount">0 รายการ</span>
+          </div>
+
+          <div class="filter-toolbar" style="margin-bottom:12px">
+            <div class="filter-row" style="grid-template-columns:1.5fr 1fr">
+              <div class="field">
+                <label for="policySearch">ค้นหาในตารางเกณฑ์</label>
+                <input
+                  class="input"
+                  id="policySearch"
+                  type="search"
+                  placeholder="ค้นหา SKU / ชื่อสามัญ…"
+                />
+              </div>
+              <div class="field">
+                <label for="policyUnit">หน่วยนับ</label>
+                <select class="select" id="policyUnit" aria-label="กรองหน่วยนับในตารางเกณฑ์สั่งซื้อ">
+                  <option value="">ทุกหน่วยนับ</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="reorderPolicyTable"></div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title-h2">หน่วยนับสำหรับบริหารคลัง</h2>
+              <p class="card-sub">คลิกหน่วยนับเพื่อกรองในตารางทะเบียนยา</p>
+            </div>
+            <span class="pill-tag">Per-Unit Policy</span>
+          </div>
+          <div id="unitBars"></div>
+          <div class="info-wash">
+            ไม่รวมจำนวน reorder_level ข้ามหน่วยนับ เพราะ tablet, bottle, tube ฯลฯ เป็นหน่วยคนละประเภท
+          </div>
+        </article>
+      </section>
+
+      <!-- MODE 3: DRUG EXPLORER -->
+      <section id="explorer" class="layout-grid mode-body hide">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title-h1">โครงสร้างรหัส ATC ระดับแรก</h2>
+              <p class="card-sub">จำแนกตามตัวอักษรตัวแรกของ WHO ATC Code (คลิกเพื่อกรอง)</p>
+            </div>
+            <span class="pill-tag mint">ATC Level 1</span>
+          </div>
+          <div id="atcBars"></div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title-h2">ชื่อสามัญที่มีหลาย SKU</h2>
+              <p class="card-sub">ต่างความแรงหรือรูปแบบยา (คลิกเพื่อดูครบทุกความแรง)</p>
+            </div>
+            <span class="pill-tag gold tabular" id="repeatsCountPill"></span>
+          </div>
+          <div class="field" style="margin-bottom:10px">
+            <label for="repeatSearch">ค้นหาชื่อสามัญที่มีหลาย SKU</label>
+            <input
+              class="input"
+              id="repeatSearch"
+              type="search"
+              placeholder="พิมพ์ชื่อสามัญยา เช่น Paracetamol, Amoxicillin…"
+            />
+          </div>
+          <div id="genericRepeats" class="detail-list"></div>
+          <div class="info-wash">
+            ATC Code อาจซ้ำได้ในหลาย SKU จึงใช้ SKU เป็นตัวระบุรายการยาแต่ละตัว
+          </div>
+        </article>
+      </section>
+
+      <!-- MASTER DRUG CATALOG PANEL -->
+      <article id="catalogPanel" class="card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title-h1">
+              <span id="tableTitle">ค้นหาทะเบียนยา (Drug Catalog)</span>
+              <span class="pill-tag mint tabular" id="tableCount" aria-live="polite">(0 รายการ)</span>
+            </h2>
+            <p class="card-sub" id="tableSubtitle">
+              แสดงข้อมูลครบทุกฟิลด์ในหน้าจอเดียวไม่ต้องเลื่อนซ้ายขวา · คลิกที่แถวยาเพื่อดูรายละเอียดและล็อตสต็อก
+            </p>
+          </div>
+          <button type="button" class="btn btn-primary" id="export">Export Catalog CSV</button>
+        </div>
+
+        <div class="filter-toolbar">
+          <div class="filter-top-row">
+            <div class="field search-field">
+              <label for="search">ค้นหาทะเบียนยา</label>
+              <input
+                class="input"
+                id="search"
+                type="search"
+                placeholder="ค้นหา SKU, ชื่อสามัญ, ความแรง, รูปแบบยา, หน่วยนับ, หมวดหมู่ หรือ ATC…"
+                aria-label="ค้นหารายการยา"
+              />
+            </div>
+
+            <div class="chip-group" id="coveragePills" role="group" aria-label="กรองสถานะบันทึกสต็อก">
+              <button type="button" class="filter-pill active" data-cov="">ทั้งหมด</button>
+              <button type="button" class="filter-pill" data-cov="stocked">มีบันทึกสต็อก</button>
+              <button type="button" class="filter-pill" data-cov="unstocked">ยังไม่มีบันทึกสต็อก</button>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <div class="field">
+              <label for="category">หมวดหมู่ยา</label>
+              <select class="select" id="category" aria-label="กรองหมวดหมู่">
+                <option value="">ทุกหมวดหมู่</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="unit">หน่วยนับ</label>
+              <select class="select" id="unit" aria-label="กรองหน่วยนับ">
+                <option value="">ทุกหน่วยนับ</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="dosageForm">รูปแบบยา</label>
+              <select class="select" id="dosageForm" aria-label="กรองรูปแบบยา">
+                <option value="">ทุกรูปแบบยา</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="atcLevel1">กลุ่ม ATC ระดับ 1</label>
+              <select class="select" id="atcLevel1" aria-label="กรองกลุ่ม ATC ระดับ 1">
+                <option value="">ทุกกลุ่ม ATC</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="reorderTier">เกณฑ์สั่งซื้อ (Reorder)</label>
+              <select class="select" id="reorderTier" aria-label="กรองช่วง Reorder Level">
+                <option value="">ทุกเกณฑ์สั่งซื้อ</option>
+                <option value="low">เกณฑ์ต่ำ (≤ 20)</option>
+                <option value="mid">เกณฑ์กลาง (21 ถึง 99)</option>
+                <option value="std">มาตรฐาน (= 100)</option>
+                <option value="high">เกณฑ์สูง (≥ 200)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="catalogSort">เรียงลำดับ</label>
+              <select class="select" id="catalogSort" aria-label="เรียงลำดับทะเบียนยา">
+                <option value="sku">SKU (A ถึง Z)</option>
+                <option value="generic">ชื่อสามัญ (A ถึง Z)</option>
+                <option value="reorder_desc">Reorder Level (มาก → น้อย)</option>
+                <option value="reorder_asc">Reorder Level (น้อย → มาก)</option>
+                <option value="atc">รหัส ATC (A ถึง Z)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="active-chips-bar">
+            <div class="active-chips" id="catalogActiveChips"></div>
+            <button type="button" class="btn btn-outline-dark btn-sm hide" id="reset">
+              ล้างตัวกรองทั้งหมด
+            </button>
+          </div>
+        </div>
+
+        <div id="catalog"></div>
+
+        <div class="pager">
+          <span id="paginationInfo" class="tabular"></span>
+          <div class="pager-controls">
+            <label for="catalogPageSize">แสดง</label>
+            <select id="catalogPageSize" aria-label="จำนวนแถวต่อหน้า">
+              <option value="12" selected>12 / หน้า</option>
+              <option value="25">25 / หน้า</option>
+              <option value="50">50 / หน้า</option>
+            </select>
+            <button type="button" class="btn btn-sm" id="prev">ก่อนหน้า</button>
+            <button type="button" class="btn btn-sm" id="next">ถัดไป</button>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <!-- Frap Floating Action Button -->
+    <button
+      type="button"
+      class="frap-fab"
+      id="frapSearchBtn"
+      title="ไปยังช่องค้นหาทะเบียนยา (ปุ่ม /)"
+      aria-label="ไปยังช่องค้นหาทะเบียนยา"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M21 21l-4.35-4.35"></path>
+      </svg>
+    </button>
+
+    <!-- Native <dialog> 1: Drug Detail -->
+    <dialog class="sb-dialog" id="drugModal" closedby="any" aria-labelledby="drugModalTitle">
+      <div class="dialog-scroll">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="drugModalTitle">รายละเอียดทะเบียนยา</h2>
+            <p class="card-sub" id="drugModalSub"></p>
+          </div>
+          <form method="dialog">
+            <button type="submit" class="btn btn-outline-dark btn-sm">ปิด (Esc)</button>
+          </form>
+        </div>
+        <div id="drugModalBody"></div>
+      </div>
+    </dialog>
+
+    <!-- Native <dialog> 2: JSON Sync & Data Update -->
+    <dialog class="sb-dialog" id="syncModal" closedby="any" aria-labelledby="syncModalTitle">
+      <div class="dialog-scroll">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="syncModalTitle">JSON Sync &amp; อัปเดตข้อมูลทะเบียนยา</h2>
+            <p class="card-sub">
+              อ่านซิงก์จากไฟล์ <code>data/*.json</code> อัปโหลดหรือวาง JSON เพื่อผสาน/แทนที่ข้อมูล หรือเพิ่มรายการด่วน
+            </p>
+          </div>
+          <form method="dialog">
+            <button type="submit" class="btn btn-outline-dark btn-sm">ปิด (Esc)</button>
+          </form>
+        </div>
+
+        <div class="sync-tabs" role="tablist" aria-label="โหมดการซิงก์ข้อมูล">
+          <button type="button" class="filter-pill active" data-sync-tab="upload">
+            อัปโหลด / วาง JSON
+          </button>
+          <button type="button" class="filter-pill" data-sync-tab="quick">
+            เพิ่ม / แก้ไขด่วน
+          </button>
+          <button type="button" class="filter-pill" data-sync-tab="manage">
+            ซิงก์และส่งออก JSON
+          </button>
+        </div>
+
+        <div id="syncTab-upload">
+          <div class="drop-zone" id="syncDropZone">
+            <div>
+              <strong>เลือกไฟล์ JSON หรือวางไฟล์ลงที่นี่</strong>
+              <span class="cell-sub">รองรับทั้งโครงสร้าง <code>{ meta, items }</code> และอาร์เรย์รายการ</span>
+            </div>
+            <input type="file" id="syncFileInput" accept=".json,application/json" style="max-width:240px" />
+          </div>
+
+          <div class="sync-form-grid" style="margin-bottom:10px">
+            <div class="field">
+              <label for="syncTargetSelect">ชุดข้อมูลปลายทาง</label>
+              <select class="select" id="syncTargetSelect">
+                <option value="auto">ตรวจจับอัตโนมัติ</option>
+                <option value="drugs">drugs_update.json (ทะเบียนยา)</option>
+                <option value="stock">stock.json (สต็อกรายล็อต)</option>
+                <option value="dispense">dispense-log.json (ประวัติจ่ายยา)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>รูปแบบการอัปเดต</label>
+              <div class="chip-group">
+                <button type="button" class="filter-pill active" data-sync-mode="merge">
+                  ผสานตามรหัส (Merge)
+                </button>
+                <button type="button" class="filter-pill" data-sync-mode="replace">
+                  แทนที่ชุด (Replace)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="syncJsonText">ข้อมูล JSON ที่ต้องการอัปเดต</label>
+            <textarea
+              class="textarea"
+              id="syncJsonText"
+              placeholder='ตัวอย่าง: {"items":[{"sku":"VITD1000","generic_name":"Cholecalciferol","strength":"1000 IU","dosage_form":"tablet","unit":"tablet","category":"วิตามินและเกลือแร่","atc_code":"A11CC05","reorder_level":60}]}'
+            ></textarea>
+          </div>
+
+          <div class="diff-box" id="syncPreviewBox">
+            วางข้อมูล JSON หรือเลือกไฟล์เพื่อตรวจสอบความถูกต้องและดูตัวอย่างผลต่าง (Diff Preview)
+          </div>
+
+          <div class="card-head-actions">
+            <button type="button" class="btn btn-primary" id="syncApplyBtn" disabled>
+              ยืนยันอัปเดตข้อมูลเข้าระบบ
+            </button>
+            <button type="button" class="btn btn-outline-dark btn-sm" id="syncClearInputBtn">
+              ล้างข้อมูลนำเข้า
+            </button>
+          </div>
+        </div>
+
+        <div id="syncTab-quick" class="hide">
+          <div class="field" style="margin-bottom:12px">
+            <label for="quickFormType">ประเภทข้อมูลที่ต้องการเพิ่มหรืออัปเดต</label>
+            <select class="select" id="quickFormType">
+              <option value="drugs">เพิ่ม / อัปเดตทะเบียนยา (drugs_update.json)</option>
+              <option value="stock">เพิ่ม / อัปเดตล็อตสต็อก (stock.json)</option>
+            </select>
+          </div>
+          <div id="quickFormFields" class="sync-form-grid"></div>
+          <div class="diff-box hide" id="quickFormStatus"></div>
+          <div class="card-head-actions" style="margin-top:14px">
+            <button type="button" class="btn btn-primary" id="quickFormSaveBtn">
+              บันทึกเข้าระบบและซิงก์
+            </button>
+          </div>
+        </div>
+
+        <div id="syncTab-manage" class="hide">
+          <div class="diff-box" id="syncModeDetail"></div>
+          <div class="filter-row" style="margin-bottom:14px">
+            <div class="field">
+              <label for="autoSyncSelect">ซิงก์อัตโนมัติจากไฟล์ disk (Auto-Sync)</label>
+              <select class="select" id="autoSyncSelect">
+                <option value="0">ปิดการซิงก์อัตโนมัติ</option>
+                <option value="15">ซิงก์ทุก 15 วินาที</option>
+                <option value="30">ซิงก์ทุก 30 วินาที</option>
+              </select>
+            </div>
+            <div class="card-head-actions">
+              <button type="button" class="btn btn-primary btn-sm" id="syncNowModalBtn">
+                อ่านไฟล์จาก disk ตอนนี้
+              </button>
+              <button type="button" class="btn btn-outline-green btn-sm" id="connectDirBtn">
+                เชื่อมต่อโฟลเดอร์ data/
+              </button>
+              <button type="button" class="btn btn-outline-dark btn-sm" id="syncResetDiskBtn">
+                รีเซ็ตกลับไปไฟล์ต้นฉบับ
+              </button>
+            </div>
+          </div>
+
+          <h3 style="margin:12px 0 8px;font-size:14px">ดาวน์โหลดไฟล์ JSON ที่อัปเดตแล้ว</h3>
+          <div class="chip-group" style="margin-bottom:14px">
+            <button type="button" class="btn btn-sm" data-export-json="drugs">drugs_update.json</button>
+            <button type="button" class="btn btn-sm" data-export-json="stock">stock.json</button>
+            <button type="button" class="btn btn-sm" data-export-json="dispense">dispense-log.json</button>
+          </div>
+
+          <h3 style="margin:12px 0 8px;font-size:14px">ประวัติการซิงก์ล่าสุด</h3>
+          <div class="history-list" id="syncHistoryList"></div>
+        </div>
+      </div>
+    </dialog>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>
+          <div class="footer-brand">Pharmacy Control · Drug Master Intelligence</div>
+          <p class="footer-copy">
+            ข้อมูลในไฟล์นี้เป็นทะเบียนยาและ Reorder Level จำลอง ไม่ใช่ข้อมูลการขายหรือปริมาณสต็อกปัจจุบัน
+          </p>
+        </div>
+        <div class="footer-copy">
+          Self-contained HTML/CSS/JS, <code>data/drugs_update.json</code>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./sync-store.js"></script>
+    <script src="./datetime-ui.js"></script>
+    <script>
+      (async () => {
+        'use strict';
+        const $ = (id) => document.getElementById(id);
+
+        const ATC_NAMES = {
+          A: 'Alimentary tract & metabolism',
+          B: 'Blood & blood forming organs',
+          C: 'Cardiovascular system',
+          D: 'Dermatologicals',
+          G: 'Genito-urinary & sex hormones',
+          H: 'Systemic hormonal preparations',
+          J: 'Antiinfectives for systemic use',
+          L: 'Antineoplastic & immunomodulating',
+          M: 'Musculo-skeletal system',
+          N: 'Nervous system',
+          P: 'Antiparasitic products',
+          R: 'Respiratory system',
+          S: 'Sensory organs',
+          V: 'Various'
+        };
+
+        const PDT = window.PharmacyDateTime;
+
+        const clean = (s) =>
+          String(s ?? '').replace(/[&<>"']/g, (c) =>
+            ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+          );
+
+        const fmt = (n) => Number(n).toLocaleString('th-TH');
+
+        function setupDialogLightDismiss(dialog) {
+          if (!('closedBy' in HTMLDialogElement.prototype)) {
+            const insidePopover = (e) => Boolean(e.target?.closest?.('[popover], .dtp-popover, .tz-popover'));
+            const outside = (e) => {
+              if (insidePopover(e)) return false;
+              const r = dialog.getBoundingClientRect();
+              return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+            };
+            let pressedOutside = false;
+            dialog.addEventListener('pointerdown', (e) => {
+              pressedOutside = outside(e);
+            });
+            dialog.addEventListener('pointerup', (e) => {
+              if (pressedOutside && outside(e)) dialog.close();
+            });
+          }
+        }
+
+        function showToast(msg) {
+          $('syncToastText').textContent = msg;
+          $('syncToast').classList.remove('hide');
+        }
+
+        let currentBundle = null;
+        let data = null;
+        let items = [];
+        let stockData = null;
+        let stockBySku = new Map();
+        let categories = [];
+        let units = [];
+        let dosageForms = [];
+        let atcCount = [];
+        let repeats = [];
+        let stockedSkuCount = 0;
+        let unstockedSkuCount = 0;
+
+        let activeMode = 'overview';
+        let page = 1;
+        let pageSize = 12;
+        let coverageFilter = '';
+        let syncMode = 'merge';
+        let pendingSyncPayload = null;
+        let pendingSyncDataset = null;
+
+        const uniq = (k) => new Set(items.map((x) => x[k])).size;
+        const countBy = (k) => {
+          const m = new Map();
+          items.forEach((x) => m.set(x[k], (m.get(x[k]) || 0) + 1));
+          return [...m]
+            .map(([label, n]) => ({ label, n }))
+            .sort((a, b) => b.n - a.n || String(a.label).localeCompare(String(b.label), 'th'));
+        };
+
+        function populateSelect(id, opts) {
+          const sel = $(id);
+          const prev = sel.value;
+          while (sel.options.length > 1) sel.remove(1);
+          opts.forEach(([label, val]) => sel.add(new Option(label, val)));
+          if ([...sel.options].some((o) => o.value === prev)) sel.value = prev;
+        }
+
+        function updateSyncUi(syncMeta) {
+          if (!syncMeta) return;
+          const timeStr = PDT.formatInstantInTz(syncMeta.lastSyncAt, PDT.getTimeZone(), { includeSeconds: true });
+          const modeLabel =
+            syncMeta.mode === 'disk-api'
+              ? 'Disk Read/Write'
+              : syncMeta.mode === 'fs-access'
+                ? 'Folder Sync'
+                : syncMeta.overrideDatasets.length
+                  ? `อัปเดตในเบราว์เซอร์ (${syncMeta.overrideDatasets.length})`
+                  : 'อ่านจาก data/';
+          $('heroSyncStatusTag').textContent = `ซิงก์: ${modeLabel} (${timeStr})`;
+
+          const modeInfo =
+            syncMeta.mode === 'disk-api'
+              ? 'เชื่อมต่อ Node Sync API (sync-server.mjs) — อ่านและเขียนลงไฟล์ data/*.json โดยตรง'
+              : syncMeta.mode === 'fs-access'
+                ? 'เชื่อมต่อโฟลเดอร์ data/ ผ่าน File System Access API — เขียนไฟล์ JSON ลงเครื่องโดยตรง'
+                : 'ทำงานแบบ Static Web — จัดเก็บอัปเดตในเบราว์เซอร์ข้ามหน้าอัตโนมัติ หรือเชื่อมต่อโฟลเดอร์ data/ บน Chrome';
+          $('syncModeDetail').innerHTML = `<strong>สถานะซิงก์ปัจจุบัน:</strong> ${modeInfo}<br><span class="cell-sub">ซิงก์ล่าสุดเมื่อ ${clean(timeStr)}</span>`;
+
+          const hist = syncMeta.history || [];
+          $('syncHistoryList').innerHTML = hist.length
+            ? hist
+                .map(
+                  (h) =>
+                    `<div class="history-item">
+                      <span><strong>${clean(h.dataset)}</strong> (${clean(h.mode)}) · +${h.added} / ~${h.updated} / รวม ${h.total}</span>
+                      <span class="tabular">${clean(PDT.formatInstantInTz(h.ts, PDT.getTimeZone()))} (${clean(PDT.getTimeZone())}) · ${clean(h.persistedTo)}</span>
+                    </div>`
+                )
+                .join('')
+            : '<div class="empty">ยังไม่มีประวัติการอัปเดตในเซสชันนี้</div>';
+        }
+
+        function renderBarButtons(rows, filterAttr, labelFn = (x) => x.label) {
+          const max = Math.max(1, ...rows.map((x) => x.n));
+          return (
+            '<div class="bars-list">' +
+            rows
+              .map(
+                (x) =>
+                  `<button type="button" class="bar-btn" ${filterAttr}="${clean(x.label)}" title="คลิกเพื่อกรอง ${clean(labelFn(x))}">
+                    <span class="bar-label">${clean(labelFn(x))}</span>
+                    <span class="bar-track"><span class="bar-fill" style="display:block;width:${Math.max(2, (x.n / max) * 100)}%"></span></span>
+                    <span class="bar-val tabular">${x.n} SKU</span>
+                  </button>`
+              )
+              .join('') +
+            '</div>'
+          );
+        }
+
+        function renderDonutSvg(rows) {
+          const total = rows.reduce((s, x) => s + x.n, 0);
+          const r = 62;
+          const circ = 2 * Math.PI * r;
+          let offset = 0;
+          const circles = rows
+            .map((x, i) => {
+              const len = (x.n / Math.max(1, total)) * circ;
+              const seg = `<circle class="donut-c${i % 9}" cx="80" cy="80" r="${r}" fill="transparent" stroke-width="22" stroke-dasharray="${len.toFixed(2)} ${circ.toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}"></circle>`;
+              offset += len;
+              return seg;
+            })
+            .join('');
+
+          const legend = rows
+            .map(
+              (x, i) =>
+                `<button type="button" class="legend-btn" data-filter-unit="${clean(x.label)}">
+                  <span class="legend-swatch donut-c${i % 9}" aria-hidden="true"></span>
+                  <span>${clean(x.label)}</span>
+                  <strong class="tabular">${x.n} (${((x.n / total) * 100).toFixed(1)}%)</strong>
+                </button>`
+            )
+            .join('');
+
+          return `
+            <div class="donut-box">
+              <svg class="donut-svg" width="196" height="196" viewBox="0 0 160 160" aria-label="สัดส่วนหน่วยนับยา">
+                ${circles}
+              </svg>
+              <div class="donut-center">
+                <b class="tabular">${total}</b>
+                <span>Master SKUs</span>
+              </div>
+            </div>
+            <div class="legend-grid">${legend}</div>
+          `;
+        }
+
+        function bindChartFilters() {
+          document.querySelectorAll('[data-filter-cat]').forEach((btn) => {
+            btn.onclick = () => {
+              const v = btn.dataset.filterCat;
+              $('category').value = $('category').value === v ? '' : v;
+              page = 1;
+              renderTable();
+              $('catalogPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+          });
+          document.querySelectorAll('[data-filter-unit]').forEach((btn) => {
+            btn.onclick = () => {
+              const v = btn.dataset.filterUnit;
+              $('unit').value = $('unit').value === v ? '' : v;
+              page = 1;
+              renderTable();
+              $('catalogPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+          });
+          document.querySelectorAll('[data-filter-atc]').forEach((btn) => {
+            btn.onclick = () => {
+              const v = btn.dataset.filterAtc;
+              $('atcLevel1').value = $('atcLevel1').value === v ? '' : v;
+              page = 1;
+              renderTable();
+              $('catalogPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+          });
+        }
+
+        function syncChartActiveStates() {
+          const curCat = $('category').value;
+          const curUnit = $('unit').value;
+          const curAtc = $('atcLevel1').value;
+          document.querySelectorAll('[data-filter-cat]').forEach((b) => {
+            b.classList.toggle('active', b.dataset.filterCat === curCat && curCat !== '');
+          });
+          document.querySelectorAll('[data-filter-unit]').forEach((b) => {
+            b.classList.toggle('active', b.dataset.filterUnit === curUnit && curUnit !== '');
+          });
+          document.querySelectorAll('[data-filter-atc]').forEach((b) => {
+            b.classList.toggle('active', b.dataset.filterAtc === curAtc && curAtc !== '');
+          });
+        }
+
+        function renderRepeats() {
+          const q = $('repeatSearch').value.trim().toLowerCase();
+          const list = q ? repeats.filter((x) => x.label.toLowerCase().includes(q)) : repeats;
+          $('genericRepeats').innerHTML = list.length
+            ? list
+                .map((x) => {
+                  const strengths = items
+                    .filter((z) => z.generic_name === x.label)
+                    .map((z) => `${z.strength} (${z.dosage_form})`)
+                    .join(' · ');
+                  return `<button type="button" class="repeat-btn" data-repeat-name="${clean(x.label)}">
+                    <span>
+                      <strong>${clean(x.label)}</strong>
+                      <small>${clean(strengths)}</small>
+                    </span>
+                    <span class="pill-tag mint tabular">${x.n} SKU</span>
+                  </button>`;
+                })
+                .join('')
+            : '<div class="empty">ไม่พบชื่อสามัญที่ตรงคำค้นหา</div>';
+
+          document.querySelectorAll('[data-repeat-name]').forEach((btn) => {
+            btn.onclick = () => {
+              $('search').value = btn.dataset.repeatName;
+              page = 1;
+              renderTable();
+              $('catalogPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+          });
+        }
+
+        function renderPolicyTable() {
+          const u = $('policyUnit').value;
+          const q = $('policySearch').value.trim().toLowerCase();
+          const matches = items
+            .filter(
+              (x) =>
+                (!u || x.unit === u) &&
+                (!q ||
+                  [x.sku, x.generic_name, x.strength, x.category]
+                    .join(' ')
+                    .toLowerCase()
+                    .includes(q))
+            )
+            .sort((a, b) => b.reorder_level - a.reorder_level || a.sku.localeCompare(b.sku));
+
+          $('policyUnit').classList.toggle('is-filtered', Boolean(u));
+          $('policySearch').classList.toggle('is-filtered', Boolean(q));
+          $('policyCount').textContent = `${matches.length} รายการ`;
+          $('reorderPolicyTable').innerHTML = `
+            <div class="table-container compact-table table-scroll-policy" tabindex="0" role="region" aria-labelledby="policyCap">
+              <table class="tbl-policy">
+                <caption id="policyCap" class="sr-only">ตารางเกณฑ์สั่งซื้อใหม่ราย SKU</caption>
+                <colgroup><col class="c1" /><col class="c2" /><col class="c3" /><col class="c4" /></colgroup>
+                <thead>
+                  <tr>
+                    <th scope="col">SKU และชื่อสามัญ</th>
+                    <th scope="col">ความแรง</th>
+                    <th scope="col">หน่วยนับ</th>
+                    <th scope="col" class="num">เกณฑ์สั่งซื้อใหม่</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${
+                    matches
+                      .map(
+                        (x) =>
+                          `<tr class="clickable-row" data-detail-sku="${clean(x.sku)}">
+                            <th scope="row">
+                              <button type="button" class="sku-btn">${clean(x.sku)}</button>
+                              <span class="cell-sub">${clean(x.generic_name)}</span>
+                            </th>
+                            <td>${clean(x.strength)}</td>
+                            <td>${clean(x.unit)}</td>
+                            <td class="num tabular"><strong>${fmt(x.reorder_level)}</strong></td>
+                          </tr>`
+                      )
+                      .join('') ||
+                    '<tr><td colspan="4" class="empty">ไม่พบรายการที่ตรงเงื่อนไข</td></tr>'
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="gold-callout">
+              เกณฑ์แต่ละ SKU เป็นนโยบายสมมติของร้าน และไม่ใช่จำนวนที่ต้องสั่งซื้อจริง
+            </div>
+          `;
+          document.querySelectorAll('#reorderPolicyTable [data-detail-sku]').forEach((row) => {
+            row.onclick = () => openDrugModal(row.dataset.detailSku);
+          });
+        }
+
+        function syncCoveragePills() {
+          document.querySelectorAll('#coveragePills [data-cov]').forEach((b) => {
+            b.classList.toggle('active', b.dataset.cov === coverageFilter);
+          });
+        }
+
+        function switchMode(mode) {
+          activeMode = mode;
+          document.querySelectorAll('[data-mode]').forEach((b) => {
+            const yes = b.dataset.mode === mode;
+            b.classList.toggle('active', yes);
+            b.setAttribute('aria-pressed', String(yes));
+          });
+          document.querySelectorAll('.mode-body').forEach((sec) => {
+            sec.classList.toggle('hide', sec.id !== mode);
+          });
+
+          const KPI_MAP = {
+            overview: [
+              ['SKU ทั้งหมด', items.length, 'รายการยาในทะเบียน', ''],
+              ['หมวดหมู่ยา', categories.length, 'categories', ''],
+              ['ชื่อสามัญ', uniq('generic_name'), 'unique generic names', ''],
+              ['รูปแบบยา', dosageForms.length, 'dosage forms', ''],
+              ['รหัส ATC ไม่ซ้ำ', uniq('atc_code'), 'WHO ATC 2026', 'gold']
+            ],
+            inventory: [
+              ['SKU ทั้งหมด', items.length, 'รายการยาในทะเบียน', ''],
+              ['เกณฑ์ ≤ 20', items.filter((x) => x.reorder_level <= 20).length, 'SKU (กลุ่มควบคุม/ขวด)', ''],
+              ['เกณฑ์ 21–100', items.filter((x) => x.reorder_level > 20 && x.reorder_level <= 100).length, 'SKU', ''],
+              ['เกณฑ์ ≥ 200', items.filter((x) => x.reorder_level >= 200).length, 'SKU (High volume)', 'warn'],
+              ['หน่วยนับ', units.length, 'unit types', 'gold']
+            ],
+            explorer: [
+              ['SKU ทั้งหมด', items.length, 'รายการยาในทะเบียน', ''],
+              ['ชื่อสามัญ', uniq('generic_name'), 'unique names', ''],
+              ['ชื่อสามัญหลาย SKU', repeats.length, 'ต่างความแรง/รูปแบบ', ''],
+              ['รหัส ATC ไม่ซ้ำ', uniq('atc_code'), 'WHO ATC codes', 'gold'],
+              ['มีบันทึกสต็อก', stockedSkuCount, `จาก ${items.length} SKU`, '']
+            ]
+          };
+
+          const MODE_DESC = {
+            overview: `ภาพรวมทะเบียนยา: ความหลากหลายของหมวดหมู่ ${categories.length} กลุ่ม รูปแบบยา ${dosageForms.length} ชนิด และหน่วยนับ ${units.length} แบบ`,
+            inventory: 'วิเคราะห์เกณฑ์ Reorder ที่กำหนดไว้ใน Drug Master — ไม่มีข้อมูลสต็อกจริงหรือสถานะของขาด',
+            explorer: 'สำรวจโครงสร้างรหัส WHO ATC ระดับแรก ชื่อสามัญที่มีหลายความแรง และค้นหาราย SKU'
+          };
+
+          $('modeDesc').textContent = MODE_DESC[mode];
+          $('kpis').innerHTML = KPI_MAP[mode]
+            .map(
+              ([label, num, note, cls]) =>
+                `<div class="kpi-card ${cls}">
+                  <div>
+                    <div class="kpi-label">${clean(label)}</div>
+                    <div class="kpi-value tabular">${fmt(num)}</div>
+                  </div>
+                  <div class="kpi-foot">${clean(note)}</div>
+                </div>`
+            )
+            .join('');
+
+          if (mode === 'inventory' && $('catalogSort').value === 'sku') {
+            $('catalogSort').value = 'reorder_desc';
+          }
+          page = 1;
+          renderTable();
+        }
+
+        function getFilteredCatalog() {
+          const q = $('search').value.trim().toLowerCase();
+          const cat = $('category').value;
+          const u = $('unit').value;
+          const df = $('dosageForm').value;
+          const atc1 = $('atcLevel1').value;
+          const tier = $('reorderTier').value;
+          const sortBy = $('catalogSort').value;
+
+          const arr = items.filter((x) => {
+            if (cat && x.category !== cat) return false;
+            if (u && x.unit !== u) return false;
+            if (df && x.dosage_form !== df) return false;
+            if (atc1 && x.atc_code[0] !== atc1) return false;
+            if (coverageFilter === 'stocked' && !stockBySku.has(x.sku)) return false;
+            if (coverageFilter === 'unstocked' && stockBySku.has(x.sku)) return false;
+            if (tier) {
+              if (tier === 'low' && !(x.reorder_level <= 20)) return false;
+              if (tier === 'mid' && !(x.reorder_level >= 21 && x.reorder_level <= 99)) return false;
+              if (tier === 'std' && x.reorder_level !== 100) return false;
+              if (tier === 'high' && !(x.reorder_level >= 200)) return false;
+            }
+            if (
+              q &&
+              ![
+                x.sku,
+                x.generic_name,
+                x.strength,
+                x.dosage_form,
+                x.unit,
+                x.category,
+                x.atc_code
+              ]
+                .join(' ')
+                .toLowerCase()
+                .includes(q)
+            ) {
+              return false;
+            }
+            return true;
+          });
+
+          arr.sort((a, b) => {
+            if (sortBy === 'generic') {
+              return a.generic_name.localeCompare(b.generic_name) || a.sku.localeCompare(b.sku);
+            }
+            if (sortBy === 'reorder_desc') {
+              return b.reorder_level - a.reorder_level || a.sku.localeCompare(b.sku);
+            }
+            if (sortBy === 'reorder_asc') {
+              return a.reorder_level - b.reorder_level || a.sku.localeCompare(b.sku);
+            }
+            if (sortBy === 'atc') {
+              return a.atc_code.localeCompare(b.atc_code) || a.sku.localeCompare(b.sku);
+            }
+            return a.sku.localeCompare(b.sku);
+          });
+
+          return arr;
+        }
+
+        function renderActiveChips() {
+          const chips = [];
+          const q = $('search').value.trim();
+          const cat = $('category').value;
+          const u = $('unit').value;
+          const df = $('dosageForm').value;
+          const atc1 = $('atcLevel1').value;
+          const tier = $('reorderTier').value;
+
+          if (q) chips.push({ key: 'search', label: `ค้นหา: "${q}"` });
+          if (coverageFilter)
+            chips.push({
+              key: 'cov',
+              label:
+                coverageFilter === 'stocked'
+                  ? 'สต็อก: มีบันทึกใน stock.json'
+                  : 'สต็อก: ยังไม่มีบันทึกสต็อก'
+            });
+          if (cat) chips.push({ key: 'cat', label: `หมวด: ${cat}` });
+          if (u) chips.push({ key: 'unit', label: `หน่วย: ${u}` });
+          if (df) chips.push({ key: 'df', label: `รูปแบบ: ${df}` });
+          if (atc1) chips.push({ key: 'atc', label: `ATC 1: ${atc1}` });
+          if (tier) {
+            const sel = $('reorderTier');
+            chips.push({ key: 'tier', label: `เกณฑ์: ${sel.options[sel.selectedIndex].text}` });
+          }
+
+          $('catalogActiveChips').innerHTML = chips.length
+            ? chips
+                .map(
+                  (c) =>
+                    `<span class="active-chip">${clean(c.label)} <button type="button" data-clear-cat="${c.key}" aria-label="ลบตัวกรอง">×</button></span>`
+                )
+                .join('')
+            : `<span class="card-sub">กำลังแสดงทะเบียนยาทั้งหมด ${items.length} รายการ (ยังไม่ได้กรอง)</span>`;
+
+          $('reset').classList.toggle('hide', !chips.length);
+
+          document.querySelectorAll('[data-clear-cat]').forEach((btn) => {
+            btn.onclick = () => {
+              const k = btn.dataset.clearCat;
+              if (k === 'search') $('search').value = '';
+              if (k === 'cov') {
+                coverageFilter = '';
+                syncCoveragePills();
+              }
+              if (k === 'cat') $('category').value = '';
+              if (k === 'unit') $('unit').value = '';
+              if (k === 'df') $('dosageForm').value = '';
+              if (k === 'atc') $('atcLevel1').value = '';
+              if (k === 'tier') $('reorderTier').value = '';
+              page = 1;
+              renderTable();
+            };
+          });
+        }
+
+        function renderTable() {
+          ['search', 'category', 'unit', 'dosageForm', 'atcLevel1', 'reorderTier'].forEach((id) => {
+            $(id).classList.toggle('is-filtered', Boolean($(id).value));
+          });
+          syncChartActiveStates();
+          renderActiveChips();
+
+          const arr = getFilteredCatalog();
+          const pages = Math.max(1, Math.ceil(arr.length / pageSize));
+          page = Math.max(1, Math.min(page, pages));
+          const chunk = arr.slice((page - 1) * pageSize, page * pageSize);
+
+          $('tableCount').textContent = `(${arr.length} รายการ)`;
+          $('catalog').innerHTML = chunk.length
+            ? `<div class="table-container wide-table" tabindex="0" role="region" aria-labelledby="catalogCap">
+                <table class="tbl-catalog">
+                  <caption id="catalogCap" class="sr-only">ทะเบียนยามาตรฐานกลาง</caption>
+                  <colgroup>
+                    <col class="c1" /><col class="c2" /><col class="c3" />
+                    <col class="c4" /><col class="c5" /><col class="c6" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th scope="col">SKU และชื่อสามัญ</th>
+                      <th scope="col">รูปแบบและหน่วยนับ</th>
+                      <th scope="col">หมวดหมู่ยา</th>
+                      <th scope="col">รหัส ATC</th>
+                      <th scope="col" class="num">เกณฑ์สั่งซื้อ</th>
+                      <th scope="col">สถานะสต็อก</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${chunk
+                      .map((x) => {
+                        const lots = stockBySku.get(x.sku) || [];
+                        const activeQty = lots
+                          .filter((s) => s.status === 'active')
+                          .reduce((sum, s) => sum + s.qty_on_hand, 0);
+                        const stockBadge = lots.length
+                          ? `<span class="badge good">${lots.length} lot · ${fmt(activeQty)} ${clean(x.unit)}</span>`
+                          : '<span class="badge neutral">ไม่มีบันทึก</span>';
+                        return `<tr class="clickable-row" data-detail-sku="${clean(x.sku)}">
+                          <th scope="row">
+                            <button type="button" class="sku-btn">${clean(x.sku)}</button>
+                            <span class="cell-main">${clean(x.generic_name)}</span>
+                            <span class="cell-sub tabular">${clean(x.strength)}</span>
+                          </th>
+                          <td>
+                            <div class="cell-val">
+                              <span class="cell-main">${clean(x.dosage_form)}</span>
+                              <span class="cell-sub">${clean(x.unit)}</span>
+                            </div>
+                          </td>
+                          <td><span class="pill-tag">${clean(x.category)}</span></td>
+                          <td class="mono">${clean(x.atc_code)}</td>
+                          <td class="num tabular"><span><strong>${fmt(x.reorder_level)}</strong> ${clean(x.unit)}</span></td>
+                          <td>${stockBadge}</td>
+                        </tr>`;
+                      })
+                      .join('')}
+                  </tbody>
+                </table>
+              </div>`
+            : '<div class="empty">ไม่พบรายการยาที่ตรงกับเงื่อนไขค้นหา</div>';
+
+          $('paginationInfo').textContent = arr.length
+            ? `แสดง ${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, arr.length)} จาก ${arr.length} SKU · หน้า ${page}/${pages}`
+            : '0 SKU';
+          $('prev').disabled = page <= 1;
+          $('next').disabled = page >= pages;
+
+          document.querySelectorAll('#catalog [data-detail-sku]').forEach((row) => {
+            row.onclick = () => openDrugModal(row.dataset.detailSku);
+          });
+        }
+
+        function openDrugModal(sku) {
+          const d = items.find((x) => x.sku === sku);
+          if (!d) return;
+          const lots = stockBySku.get(sku) || [];
+          const sameGeneric = items.filter(
+            (x) => x.generic_name === d.generic_name && x.sku !== d.sku
+          );
+
+          $('drugModalTitle').textContent = `${d.sku} · ${d.generic_name} (${d.strength})`;
+          $('drugModalSub').textContent = `${d.category} · ${d.dosage_form} · WHO ATC ${d.atc_code}`;
+          $('drugModalBody').innerHTML = `
+            <div class="modal-meta-grid">
+              <div class="modal-meta-box"><small>หน่วยนับ</small><strong>${clean(d.unit)}</strong></div>
+              <div class="modal-meta-box"><small>Reorder Level</small><strong class="tabular">${fmt(d.reorder_level)} ${clean(d.unit)}</strong></div>
+              <div class="modal-meta-box"><small>กลุ่ม ATC ระดับ 1</small><strong>${clean(d.atc_code[0])} · ${clean(ATC_NAMES[d.atc_code[0]] || '')}</strong></div>
+              <div class="modal-meta-box"><small>Stock Snapshot</small><strong>${lots.length ? `${lots.length} ล็อต` : 'ไม่มีบันทึก'}</strong></div>
+            </div>
+
+            ${
+              lots.length
+                ? `<h4 style="margin:12px 0 8px;font-size:14px">ล็อตใน stock.json (Snapshot ${clean(stockData?.meta?.as_of || '')})</h4>
+                   <div class="table-container compact-table" role="region" aria-label="ล็อตของ ${clean(d.sku)}">
+                     <table class="tbl-modal-lots">
+                       <thead><tr><th scope="col">Stock ID</th><th scope="col">Lot</th><th scope="col" class="num">คงเหลือ</th><th scope="col">หมดอายุ</th><th scope="col">สถานะ</th></tr></thead>
+                       <tbody>
+                        ${lots
+                          .map(
+                            (s) =>
+                              `<tr><th scope="row" class="mono">${clean(s.stock_id)}</th><td class="mono">${clean(s.lot)}</td><td class="num tabular">${fmt(s.qty_on_hand)} ${clean(d.unit)}</td><td class="tabular">${clean(s.expiry || 'ไม่ทราบ')}</td><td><span class="badge ${s.status === 'active' ? 'good' : s.status === 'quarantine' ? 'warn' : 'bad'}">${clean(s.status)}</span></td></tr>`
+                          )
+                          .join('')}
+                       </tbody>
+                     </table>
+                   </div>`
+                : '<div class="gold-callout">ไม่มีบันทึกสต็อกของ SKU นี้ใน stock.json — ระบบระบุเป็น "ไม่มีข้อมูล" ไม่ตีความว่าเป็น 0 อัตโนมัติ</div>'
+            }
+
+            ${
+              sameGeneric.length
+                ? `<h4 style="margin:14px 0 8px;font-size:14px">SKU อื่นที่มีชื่อสามัญเดียวกัน (${sameGeneric.length} รายการ)</h4>
+                   <div class="chip-group">
+                    ${sameGeneric
+                      .map(
+                        (o) =>
+                          `<button type="button" class="filter-pill" data-switch-modal="${clean(o.sku)}">${clean(o.sku)} · ${clean(o.strength)} (${clean(o.dosage_form)})</button>`
+                      )
+                      .join('')}
+                   </div>`
+                : ''
+            }
+          `;
+
+          const dlg = $('drugModal');
+          if (!dlg.open) dlg.showModal();
+          document.querySelectorAll('[data-switch-modal]').forEach((btn) => {
+            btn.onclick = () => openDrugModal(btn.dataset.switchModal);
+          });
+        }
+
+        // JSON Sync Modal
+        function evaluateSyncInput() {
+          const raw = $('syncJsonText').value.trim();
+          const box = $('syncPreviewBox');
+          const applyBtn = $('syncApplyBtn');
+          pendingSyncPayload = null;
+          pendingSyncDataset = null;
+          applyBtn.disabled = true;
+
+          if (!raw) {
+            box.className = 'diff-box';
+            box.textContent = 'วางข้อมูล JSON หรือเลือกไฟล์เพื่อตรวจสอบความถูกต้องและดูตัวอย่างผลต่าง (Diff Preview)';
+            return;
+          }
+
+          let parsed;
+          try {
+            parsed = JSON.parse(raw);
+          } catch (err) {
+            box.className = 'diff-box error';
+            box.textContent = `JSON ไม่ถูกต้อง: ${err.message}`;
+            return;
+          }
+
+          const chosenTarget = $('syncTargetSelect').value;
+          const dataset = chosenTarget === 'auto' ? window.PharmacySync.detectDataset(parsed) : chosenTarget;
+          if (!dataset) {
+            box.className = 'diff-box error';
+            box.textContent = 'ไม่สามารถตรวจจับชนิดไฟล์อัตโนมัติได้ กรุณาเลือกชุดข้อมูลปลายทางให้ตรงกับโครงสร้าง JSON';
+            return;
+          }
+
+          const check = window.PharmacySync.validateDataset(dataset, parsed, currentBundle[dataset]);
+          if (!check.ok) {
+            box.className = 'diff-box error';
+            box.textContent = `ข้อมูลไม่ครบถ้วน: ${check.errors.join(' · ')}`;
+            return;
+          }
+
+          const diff = window.PharmacySync.computeDiff(
+            dataset,
+            currentBundle[dataset],
+            check.normalized,
+            syncMode
+          );
+
+          pendingSyncPayload = check.normalized;
+          pendingSyncDataset = dataset;
+          applyBtn.disabled = false;
+
+          box.className = 'diff-box valid';
+          box.innerHTML = `<strong>พร้อมอัปเดตชุดข้อมูล: ${clean(window.PharmacySync.DATASETS[dataset].label)}</strong><br>
+            โหมด <strong>${syncMode === 'merge' ? 'ผสานตามรหัส (Merge)' : 'แทนที่ทั้งชุด (Replace)'}</strong> ·
+            เพิ่มใหม่ <strong>+${diff.added}</strong> · อัปเดต <strong>~${diff.updated}</strong> · ลบ <strong>-${diff.removed}</strong> · รวมหลังอัปเดต <strong>${diff.total}</strong> รายการ`;
+        }
+
+        function renderQuickForm() {
+          const t = $('quickFormType').value;
+          $('quickFormStatus').classList.add('hide');
+          if (t === 'drugs') {
+            $('quickFormFields').innerHTML = `
+              <div class="field"><label for="qf_sku">SKU</label><input class="input" id="qf_sku" placeholder="เช่น VITD1000" value="VITD1000"></div>
+              <div class="field"><label for="qf_gen">Generic Name</label><input class="input" id="qf_gen" value="Cholecalciferol"></div>
+              <div class="field"><label for="qf_str">ความแรง</label><input class="input" id="qf_str" value="1000 IU"></div>
+              <div class="field"><label for="qf_form">รูปแบบยา</label><input class="input" id="qf_form" value="tablet"></div>
+              <div class="field"><label for="qf_unit">หน่วยนับ</label><input class="input" id="qf_unit" value="tablet"></div>
+              <div class="field"><label for="qf_cat">หมวดหมู่ยา</label><input class="input" id="qf_cat" value="วิตามินและเกลือแร่"></div>
+              <div class="field"><label for="qf_atc">รหัส ATC</label><input class="input" id="qf_atc" value="A11CC05"></div>
+              <div class="field"><label for="qf_re">Reorder Level</label><input class="input" id="qf_re" type="number" min="0" value="60"></div>
+            `;
+          } else {
+            const snap = stockData?.meta?.as_of || PDT.nowZoned().isoDate;
+            $('quickFormFields').innerHTML = `
+              <div class="field"><label for="qf_stock_id">Stock ID</label><input class="input" id="qf_stock_id" value="S048"></div>
+              <div class="field"><label for="qf_sku">SKU ยา</label><input class="input" id="qf_sku" value="ACAR50"></div>
+              <div class="field"><label for="qf_lot">Lot</label><input class="input" id="qf_lot" value="AC2611"></div>
+              <div class="field"><label for="qf_received">วันที่รับเข้า</label><input class="input" id="qf_received" type="date" data-dtp="date" value="${clean(snap)}"></div>
+              <div class="field"><label for="qf_expiry">วันหมดอายุ</label><input class="input" id="qf_expiry" type="date" data-dtp="date-expiry" value="2028-11-30"></div>
+              <div class="field"><label for="qf_qty">จำนวนคงเหลือ</label><input class="input" id="qf_qty" type="number" min="0" value="120"></div>
+              <div class="field"><label for="qf_cost">ต้นทุน/หน่วย (บาท)</label><input class="input" id="qf_cost" type="number" min="0" step="0.01" value="1.50"></div>
+              <div class="field"><label for="qf_status">สถานะล็อต</label><select class="select" id="qf_status"><option value="active">active</option><option value="quarantine">quarantine</option><option value="written_off">written_off</option></select></div>
+            `;
+          }
+          PDT.enhanceContainer($('quickFormFields'), { snapshotDate: stockData?.meta?.as_of || '' });
+        }
+
+        function hydrateFromData(bundle) {
+          currentBundle = bundle;
+          data = bundle.drugs;
+          items = data.items;
+          stockData = bundle.stock;
+          stockBySku = new Map();
+          if (Array.isArray(stockData?.items)) {
+            stockData.items.forEach((s) => {
+              if (!stockBySku.has(s.sku)) stockBySku.set(s.sku, []);
+              stockBySku.get(s.sku).push(s);
+            });
+          }
+
+          categories = countBy('category');
+          units = countBy('unit');
+          dosageForms = countBy('dosage_form');
+          atcCount = (() => {
+            const m = new Map();
+            items.forEach((x) => {
+              const c = x.atc_code[0];
+              m.set(c, (m.get(c) || 0) + 1);
+            });
+            return [...m]
+              .map(([label, n]) => ({ label, n }))
+              .sort((a, b) => b.n - a.n || a.label.localeCompare(b.label));
+          })();
+          repeats = countBy('generic_name').filter((x) => x.n > 1);
+          stockedSkuCount = items.filter((x) => stockBySku.has(x.sku)).length;
+          unstockedSkuCount = items.length - stockedSkuCount;
+
+          const meta = data.meta || {};
+          $('fileMeta').textContent = `${items.length} SKU · ${categories.length} หมวดหมู่`;
+          $('heroVersionPill').textContent =
+            `WHO ATC 2026 · Master Data v${meta.version || '2.0'} (${meta.updated || ''})`;
+          $('heroSubtitle').textContent =
+            `วิเคราะห์ทะเบียนยา ${items.length} SKU · ${categories.length} หมวดหมู่ · ${uniq('generic_name')} ชื่อสามัญ · ${dosageForms.length} รูปแบบยา · ${units.length} หน่วยนับ · แสดงครบทุกฟิลด์พร้อมรองรับการซิงก์ JSON`;
+          $('catalogUpdatedBadge').textContent = `อัปเดต ${meta.updated || '2026-11-18'}`;
+          $('catDistPill').textContent = `${categories.length} Categories`;
+          $('unitDistPill').textContent = `${units.length} Units`;
+          $('repeatsCountPill').textContent = `${repeats.length} ชื่อสามัญ`;
+
+          if (stockData?.meta?.as_of) {
+            $('coverageSummary').textContent =
+              `${stockedSkuCount} SKU มีบันทึกใน stock.json · ${unstockedSkuCount} SKU ยังไม่มีบันทึกสต็อก`;
+            $('coverageNote').textContent =
+              `เทียบกับ Snapshot วันที่ ${stockData.meta.as_of} — ${unstockedSkuCount} SKU ที่ไม่มีบันทึกสต็อกจะไม่ถูกตีความว่าเป็น 0 อัตโนมัติ`;
+          }
+
+          $('coveragePills').innerHTML = `
+            <button type="button" class="filter-pill ${coverageFilter === '' ? 'active' : ''}" data-cov="">ทั้งหมด (${items.length})</button>
+            <button type="button" class="filter-pill ${coverageFilter === 'stocked' ? 'active' : ''}" data-cov="stocked">มีบันทึกสต็อก (${stockedSkuCount})</button>
+            <button type="button" class="filter-pill ${coverageFilter === 'unstocked' ? 'active' : ''}" data-cov="unstocked">ยังไม่มีบันทึกสต็อก (${unstockedSkuCount})</button>
+          `;
+          document.querySelectorAll('#coveragePills [data-cov]').forEach((b) => {
+            b.onclick = () => {
+              coverageFilter = b.dataset.cov;
+              syncCoveragePills();
+              page = 1;
+              renderTable();
+            };
+          });
+
+          populateSelect('category', categories.map((c) => [`${c.label} (${c.n})`, c.label]));
+          populateSelect('unit', units.map((u) => [`${u.label} (${u.n})`, u.label]));
+          populateSelect('policyUnit', units.map((u) => [`${u.label} (${u.n})`, u.label]));
+          populateSelect('dosageForm', dosageForms.map((f) => [`${f.label} (${f.n})`, f.label]));
+          populateSelect(
+            'atcLevel1',
+            atcCount.map((a) => [`${a.label} — ${ATC_NAMES[a.label] || 'Other'} (${a.n})`, a.label])
+          );
+
+          $('overviewBars').innerHTML = renderBarButtons(categories, 'data-filter-cat');
+          $('overviewDonut').innerHTML = renderDonutSvg(units);
+          $('unitBars').innerHTML = renderBarButtons(units, 'data-filter-unit');
+          $('atcBars').innerHTML = renderBarButtons(
+            atcCount,
+            'data-filter-atc',
+            (x) => `${x.label} — ${ATC_NAMES[x.label] || 'Other'}`
+          );
+
+          bindChartFilters();
+          renderRepeats();
+          renderPolicyTable();
+          updateSyncUi(bundle.syncMeta);
+          renderQuickForm();
+          switchMode(activeMode);
+        }
+
+        PDT.mountTimeTicker($('heroTimeTicker'), {
+          navClockEl: $('navClockChip')
+        });
+
+        // Initial Load
+        try {
+          const bundle = await window.PharmacySync.loadAll();
+          hydrateFromData(bundle);
+        } catch (err) {
+          $('errorBanner').classList.remove('hide');
+          $('errorBanner').textContent =
+            `โหลดทะเบียนยาไม่สำเร็จ: ${err.message} — กรุณาเปิดผ่าน Local Server (node sync-server.mjs หรือ python3 -m http.server)`;
+          return;
+        }
+
+        window.PharmacySync.subscribe((detail) => {
+          if (detail.bundle) {
+            hydrateFromData(detail.bundle);
+            if (detail.type === 'sync-updated') {
+              showToast(`อัปเดต ${detail.dataset} สำเร็จ (+${detail.diff.added} / ~${detail.diff.updated} / รวม ${detail.diff.total} รายการ)`);
+            } else if (detail.type === 'disk-synced' && detail.changed.length > 0) {
+              showToast(`ซิงก์ข้อมูลใหม่จาก disk แล้ว (${detail.changed.join(', ')})`);
+            } else if (detail.type === 'cross-tab-sync') {
+              showToast('อัปเดตข้อมูลตามการซิงก์จากแท็บอื่นแล้ว');
+            }
+          }
+        });
+
+        PDT.subscribe(() => {
+          if (currentBundle?.syncMeta) updateSyncUi(currentBundle.syncMeta);
+        });
+
+        setupDialogLightDismiss($('drugModal'));
+        setupDialogLightDismiss($('syncModal'));
+
+        // Bindings
+        $('dismissSyncToast').onclick = () => $('syncToast').classList.add('hide');
+        $('policyUnit').addEventListener('change', renderPolicyTable);
+        $('policySearch').addEventListener('input', renderPolicyTable);
+        $('repeatSearch').addEventListener('input', renderRepeats);
+
+        document.querySelectorAll('[data-cov-jump]').forEach((b) => {
+          b.onclick = () => {
+            coverageFilter = b.dataset.covJump;
+            syncCoveragePills();
+            page = 1;
+            renderTable();
+            $('catalogPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          };
+        });
+
+        ['search', 'category', 'unit', 'dosageForm', 'atcLevel1', 'reorderTier', 'catalogSort'].forEach(
+          (id) => {
+            $(id).addEventListener(id === 'search' ? 'input' : 'change', () => {
+              page = 1;
+              renderTable();
+            });
+          }
+        );
+
+        $('catalogPageSize').onchange = () => {
+          pageSize = Number($('catalogPageSize').value);
+          page = 1;
+          renderTable();
+        };
+        $('prev').onclick = () => {
+          page--;
+          renderTable();
+        };
+        $('next').onclick = () => {
+          page++;
+          renderTable();
+        };
+
+        $('reset').onclick = () => {
+          $('search').value = '';
+          $('category').value = '';
+          $('unit').value = '';
+          $('dosageForm').value = '';
+          $('atcLevel1').value = '';
+          $('reorderTier').value = '';
+          $('catalogSort').value = 'sku';
+          coverageFilter = '';
+          syncCoveragePills();
+          page = 1;
+          renderTable();
+        };
+
+        $('export').onclick = () => {
+          const arr = getFilteredCatalog();
+          const fields = ['sku', 'generic_name', 'strength', 'dosage_form', 'unit', 'category', 'atc_code', 'reorder_level'];
+          const csv =
+            '\uFEFF' +
+            [fields.join(','), ...arr.map((x) => fields.map((k) => '"' + String(x[k]).replace(/"/g, '""') + '"').join(','))].join('\r\n');
+          const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `drugs_filtered_${activeMode}.csv`;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 500);
+        };
+
+        document.querySelectorAll('[data-mode]').forEach((b) => {
+          b.onclick = () => switchMode(b.dataset.mode);
+        });
+
+        $('mobileMenuBtn').onclick = () => {
+          const open = $('mobileDrawer').classList.toggle('open');
+          $('mobileMenuBtn').setAttribute('aria-expanded', String(open));
+        };
+
+        const focusSearch = () => {
+          $('catalogPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setTimeout(() => $('search').focus(), 220);
+        };
+        $('focusCatalogBtn').onclick = focusSearch;
+        $('frapSearchBtn').onclick = focusSearch;
+
+        // Sync Modal Events
+        function openSyncModal(tab = 'upload') {
+          const dlg = $('syncModal');
+          if (!dlg.open) dlg.showModal();
+          document.querySelectorAll('[data-sync-tab]').forEach((b) => {
+            b.classList.toggle('active', b.dataset.syncTab === tab);
+          });
+          ['upload', 'quick', 'manage'].forEach((t) => {
+            $('syncTab-' + t).classList.toggle('hide', t !== tab);
+          });
+          $('autoSyncSelect').value = String(window.PharmacySync.getAutoSync());
+          updateSyncUi(currentBundle?.syncMeta);
+        }
+
+        $('openSyncBtn').onclick = () => openSyncModal('upload');
+        $('openSyncMobile').onclick = () => {
+          $('mobileDrawer').classList.remove('open');
+          $('mobileMenuBtn').setAttribute('aria-expanded', 'false');
+          openSyncModal('upload');
+        };
+        $('quickSyncMobile').onclick = () => {
+          $('mobileDrawer').classList.remove('open');
+          $('mobileMenuBtn').setAttribute('aria-expanded', 'false');
+          $('quickSyncBtn').click();
+        };
+        $('quickSyncBtn').onclick = async () => {
+          try {
+            const res = await window.PharmacySync.syncFromDisk();
+            showToast(
+              res.changed.length
+                ? `ซิงก์ไฟล์ใหม่จาก disk สำเร็จ: ${res.changed.join(', ')}`
+                : 'ซิงก์ไฟล์จาก data/ ล่าสุดเรียบร้อยแล้ว (ข้อมูลตรงกัน)'
+            );
+          } catch (err) {
+            showToast(`ซิงก์ล้มเหลว: ${err.message}`);
+          }
+        };
+
+        document.querySelectorAll('[data-sync-tab]').forEach((b) => {
+          b.onclick = () => openSyncModal(b.dataset.syncTab);
+        });
+
+        document.querySelectorAll('[data-sync-mode]').forEach((b) => {
+          b.onclick = () => {
+            syncMode = b.dataset.syncMode;
+            document.querySelectorAll('[data-sync-mode]').forEach((x) => {
+              x.classList.toggle('active', x.dataset.syncMode === syncMode);
+            });
+            evaluateSyncInput();
+          };
+        });
+
+        $('syncTargetSelect').onchange = evaluateSyncInput;
+        $('syncJsonText').addEventListener('input', evaluateSyncInput);
+        $('syncFileInput').onchange = async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          $('syncJsonText').value = await file.text();
+          evaluateSyncInput();
+        };
+
+        const dz = $('syncDropZone');
+        dz.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dz.classList.add('dragover');
+        });
+        dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+        dz.addEventListener('drop', async (e) => {
+          e.preventDefault();
+          dz.classList.remove('dragover');
+          const file = e.dataTransfer?.files?.[0];
+          if (!file) return;
+          $('syncJsonText').value = await file.text();
+          evaluateSyncInput();
+        });
+
+        $('syncClearInputBtn').onclick = () => {
+          $('syncJsonText').value = '';
+          $('syncFileInput').value = '';
+          evaluateSyncInput();
+        };
+
+        $('syncApplyBtn').onclick = async () => {
+          if (!pendingSyncPayload || !pendingSyncDataset) return;
+          try {
+            await window.PharmacySync.applyUpdate(
+              pendingSyncDataset,
+              pendingSyncPayload,
+              syncMode,
+              'json-modal'
+            );
+            $('syncJsonText').value = '';
+            $('syncFileInput').value = '';
+            evaluateSyncInput();
+            $('syncModal').close();
+          } catch (err) {
+            $('syncPreviewBox').className = 'diff-box error';
+            $('syncPreviewBox').textContent = `อัปเดตไม่สำเร็จ: ${err.message}`;
+          }
+        };
+
+        $('quickFormType').onchange = renderQuickForm;
+        $('quickFormSaveBtn').onclick = async () => {
+          const t = $('quickFormType').value;
+          const stBox = $('quickFormStatus');
+          try {
+            let item;
+            if (t === 'drugs') {
+              item = {
+                sku: $('qf_sku').value.trim(),
+                generic_name: $('qf_gen').value.trim(),
+                strength: $('qf_str').value.trim(),
+                dosage_form: $('qf_form').value.trim(),
+                unit: $('qf_unit').value.trim(),
+                category: $('qf_cat').value.trim(),
+                atc_code: $('qf_atc').value.trim(),
+                reorder_level: Number($('qf_re').value)
+              };
+            } else {
+              item = {
+                stock_id: $('qf_stock_id').value.trim(),
+                sku: $('qf_sku').value.trim(),
+                lot: $('qf_lot').value.trim(),
+                received_date: $('qf_received').value,
+                expiry: $('qf_expiry').value || null,
+                qty_on_hand: Number($('qf_qty').value),
+                unit_cost: Number($('qf_cost').value),
+                status: $('qf_status').value
+              };
+            }
+            await window.PharmacySync.applyUpdate(t, { items: [item] }, 'merge', 'quick-form');
+            stBox.className = 'diff-box valid';
+            stBox.classList.remove('hide');
+            stBox.textContent = `บันทึกและซิงก์รายการเข้า ${t} สำเร็จ`;
+          } catch (err) {
+            stBox.className = 'diff-box error';
+            stBox.classList.remove('hide');
+            stBox.textContent = err.message;
+          }
+        };
+
+        $('autoSyncSelect').onchange = () => {
+          window.PharmacySync.setAutoSync(Number($('autoSyncSelect').value));
+        };
+        $('syncNowModalBtn').onclick = () => $('quickSyncBtn').click();
+        $('connectDirBtn').onclick = async () => {
+          const res = await window.PharmacySync.connectDataDirectory();
+          if (res.connected) {
+            showToast(`เชื่อมต่อโฟลเดอร์ "${res.name}" สำเร็จ พร้อมบันทึก JSON ลง disk`);
+          } else if (res.message) {
+            showToast(res.message);
+          }
+        };
+        $('syncResetDiskBtn').onclick = async () => {
+          await window.PharmacySync.resetToDiskFiles();
+          showToast('รีเซ็ตกลับไปใช้ข้อมูลต้นฉบับจากไฟล์ data/*.json แล้ว');
+        };
+        document.querySelectorAll('[data-export-json]').forEach((btn) => {
+          btn.onclick = () => window.PharmacySync.exportDatasetJson(btn.dataset.exportJson, currentBundle);
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (
+            e.key === '/' &&
+            document.activeElement.tagName !== 'INPUT' &&
+            document.activeElement.tagName !== 'SELECT' &&
+            document.activeElement.tagName !== 'TEXTAREA'
+          ) {
+            e.preventDefault();
+            focusSearch();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

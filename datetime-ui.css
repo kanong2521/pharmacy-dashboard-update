@@ -1,0 +1,794 @@
+/* Modern Timezone-Aware Time Ticker & Date/Time Picker UI (DESIGN-starbucks.md) */
+
+:root {
+  color-scheme: light;
+  accent-color: var(--sb-green);
+  --dtp-ticker-bg: rgba(18, 41, 35, 0.72);
+  --dtp-ticker-dot: #6ee7b7;
+  --dtp-ticker-dot-glow: rgba(110, 231, 183, 0.22);
+  --dtp-white-10: rgba(255, 255, 255, 0.1);
+  --dtp-white-16: rgba(255, 255, 255, 0.16);
+  --dtp-white-18: rgba(255, 255, 255, 0.18);
+  --dtp-white-24: rgba(255, 255, 255, 0.24);
+  --dtp-white-45: rgba(255, 255, 255, 0.45);
+  --dtp-white-68: rgba(255, 255, 255, 0.68);
+  --dtp-white-86: rgba(255, 255, 255, 0.86);
+  --dtp-day-outside: rgba(0, 0, 0, 0.36);
+  --dtp-pop-backdrop: rgba(0, 0, 0, 0.16);
+}
+
+input:not(input[type='range']):user-invalid,
+select:user-invalid,
+textarea:user-invalid,
+.dtp-field:has(:user-invalid) .dtp-trigger {
+  border-color: var(--sb-red);
+  background: var(--sb-red-tint);
+}
+
+/* Header Compact Clock Chip */
+.nav-clock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--sb-green-light);
+  border: 1px solid var(--sb-green-tint);
+  color: var(--sb-house);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nav-clock-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-green);
+  flex-shrink: 0;
+  animation: sb-pulse-dot 2s ease-in-out infinite;
+}
+
+.nav-clock-chip:hover .nav-clock-dot {
+  animation-play-state: paused;
+}
+
+.nav-clock-tz {
+  font-weight: 600;
+  color: var(--sb-accent);
+  font-size: 11px;
+}
+
+@media (max-width: 1240px) {
+  .nav-clock-chip {
+    display: none;
+  }
+}
+
+@keyframes sb-pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
+/* Hero Live Time Ticker */
+.tz-ticker-card {
+  background: var(--dtp-ticker-bg);
+  border: 1px solid var(--dtp-white-16);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tz-ticker-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tz-ticker-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sb-gold-light);
+  letter-spacing: 0.02em;
+}
+
+.tz-ticker-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dtp-ticker-dot);
+  box-shadow: 0 0 0 3px var(--dtp-ticker-dot-glow);
+  animation: sb-pulse-dot 2s ease-in-out infinite;
+}
+
+.tz-ticker-card:hover .tz-ticker-dot,
+.tz-ticker-card:focus-within .tz-ticker-dot {
+  animation-play-state: paused;
+}
+
+.tz-ticker-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tz-era-btn,
+.tz-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  min-height: 28px;
+  border-radius: var(--sb-btn-radius);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid var(--dtp-white-24);
+  background: var(--dtp-white-10);
+  color: var(--sb-text-white);
+}
+
+.tz-era-btn:hover,
+.tz-trigger-btn:hover {
+  background: var(--dtp-white-18);
+  border-color: var(--dtp-white-45);
+}
+
+.tz-ticker-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tz-clock-readout {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--sb-text-white);
+}
+
+.tz-offset-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--sb-green-light);
+  color: var(--sb-house);
+  white-space: nowrap;
+}
+
+.tz-date-readout {
+  font-size: 12px;
+  color: var(--dtp-white-86);
+  line-height: 1.35;
+}
+
+.tz-zone-meta {
+  font-size: 11px;
+  color: var(--dtp-white-68);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Date/Time Field Wrapper & Trigger */
+.dtp-field {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
+.dtp-native-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+  pointer-events: none;
+}
+
+.dtp-trigger-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  position: relative;
+}
+
+.dtp-trigger {
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 64px 6px 12px;
+  background: var(--sb-white);
+  color: var(--sb-text);
+  border: 1px solid var(--sb-border);
+  border-radius: var(--sb-input-radius);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  line-height: 1.3;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dtp-trigger:hover {
+  border-color: var(--sb-accent);
+}
+
+.dtp-trigger.is-filtered {
+  background: var(--sb-green-tint);
+  border-color: var(--sb-accent);
+}
+
+.dtp-trigger.is-invalid {
+  background: var(--sb-red-tint);
+  border-color: var(--sb-red);
+}
+
+.dtp-trigger.is-placeholder .dtp-display-text {
+  color: var(--sb-text-soft);
+  font-weight: 400;
+}
+
+.dtp-display-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.dtp-zone-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--sb-ceramic);
+  color: var(--sb-house);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.dtp-trigger-icons {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.dtp-icon-cal {
+  color: var(--sb-accent);
+  display: inline-flex;
+  align-items: center;
+}
+
+.dtp-clear-btn {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-ceramic);
+  color: var(--sb-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-grid;
+  place-items: center;
+}
+
+.dtp-clear-btn:hover {
+  background: var(--sb-green-light);
+  color: var(--sb-house);
+}
+
+.dtp-clear-btn.hide {
+  display: none !important;
+}
+
+/* Native Popover Panels (Top-Layer + CSS Anchor Positioning) */
+[popover].dtp-popover,
+[popover].tz-popover {
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--sb-card-radius);
+  background: var(--sb-white);
+  color: var(--sb-text);
+  box-shadow: var(--sb-shadow-dialog);
+  width: 92%;
+  max-width: 352px;
+  max-height: min(68dvh, 520px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+[popover].dtp-popover:not(:popover-open):not(.\:popover-open),
+[popover].tz-popover:not(:popover-open):not(.\:popover-open) {
+  display: none;
+}
+
+[popover].dtp-popover:is(:popover-open, .\:popover-open),
+[popover].tz-popover:is(:popover-open, .\:popover-open) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+[popover].dtp-popover::backdrop,
+[popover].tz-popover::backdrop {
+  background: var(--dtp-pop-backdrop);
+}
+
+@supports (position-area: block-end) {
+  [popover].dtp-popover,
+  [popover].tz-popover {
+    inset: auto;
+    margin: 6px 0 0 0;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+
+  [popover].tz-popover {
+    position-area: block-end span-inline-start;
+  }
+}
+
+@supports not (position-area: block-end) {
+  @media (max-width: 600px) {
+    [popover].dtp-popover,
+    [popover].tz-popover {
+      position: fixed;
+      inset: auto 12px 12px 12px;
+      width: auto;
+      max-width: none;
+      margin: 0;
+    }
+  }
+}
+
+/* Popover Header & Controls */
+.dtp-pop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--sb-hairline);
+}
+
+.dtp-pop-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sb-house);
+}
+
+.dtp-pop-sub {
+  font-size: 11px;
+  color: var(--sb-text-soft);
+}
+
+.dtp-close-btn {
+  border: 1px solid var(--sb-border);
+  background: var(--sb-white);
+  color: var(--sb-text);
+  padding: 4px 10px;
+  min-height: 28px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dtp-close-btn:hover {
+  border-color: var(--sb-accent);
+}
+
+/* Calendar Header */
+.dtp-cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.dtp-nav-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-white);
+  color: var(--sb-house);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.dtp-nav-btn:hover {
+  background: var(--sb-green-light);
+  border-color: var(--sb-accent);
+}
+
+.dtp-month-selects {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-width: 0;
+}
+
+.dtp-mini-select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--sb-hairline);
+  border-radius: 8px;
+  background: var(--sb-neutral-cool);
+  color: var(--sb-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Calendar Grid */
+.dtp-weekdays,
+.dtp-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.dtp-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sb-text-soft);
+  padding: 4px 0;
+}
+
+.dtp-day {
+  min-height: 31px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-text);
+  font-size: 13px;
+  font-weight: 500;
+  display: grid;
+  place-items: center;
+}
+
+.dtp-day:hover {
+  background: var(--sb-ceramic);
+}
+
+.dtp-day.is-outside {
+  color: var(--dtp-day-outside);
+}
+
+.dtp-day.is-today {
+  border-color: var(--sb-gold);
+  font-weight: 700;
+  color: var(--sb-house);
+}
+
+.dtp-day.is-in-range {
+  background: var(--sb-green-light);
+  color: var(--sb-house);
+  border-radius: 8px;
+}
+
+.dtp-day.is-selected {
+  background: var(--sb-green);
+  color: var(--sb-white);
+  border-color: var(--sb-green);
+  font-weight: 700;
+  border-radius: 50%;
+}
+
+/* Quick Presets */
+.dtp-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--sb-hairline);
+}
+
+.dtp-preset-btn {
+  padding: 5px 10px;
+  min-height: 28px;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-neutral-warm);
+  color: var(--sb-house);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dtp-preset-btn:hover {
+  background: var(--sb-green-light);
+  border-color: var(--sb-accent);
+}
+
+/* Modern Time Picker Section */
+.dtp-time-panel {
+  border-top: 1px solid var(--sb-hairline);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.dtp-time-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dtp-time-steppers {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  background: var(--sb-neutral-cool);
+  border: 1px solid var(--sb-hairline);
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+
+.dtp-stepper-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dtp-stepper-col small {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--sb-text-soft);
+}
+
+.dtp-stepper-ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dtp-step-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-white);
+  color: var(--sb-house);
+  font-size: 14px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.dtp-step-btn:hover {
+  background: var(--sb-green-light);
+  border-color: var(--sb-accent);
+}
+
+.dtp-step-num {
+  width: 44px;
+  height: 34px;
+  text-align: center;
+  border: 1px solid var(--sb-border);
+  border-radius: 8px;
+  background: var(--sb-neutral-cool);
+  color: var(--sb-house);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.dtp-time-colon {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sb-house);
+  padding-top: 14px;
+}
+
+.dtp-shift-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.dtp-slot-btn {
+  padding: 4px 9px;
+  min-height: 26px;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-white);
+  color: var(--sb-text);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dtp-slot-btn:hover,
+.dtp-slot-btn.active {
+  background: var(--sb-green);
+  color: var(--sb-white);
+  border-color: var(--sb-green);
+}
+
+.dtp-dst-warn {
+  background: var(--sb-yellow-wash);
+  color: var(--sb-yellow-ink);
+  border: 1px solid var(--sb-yellow);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.dtp-pop-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--sb-hairline);
+}
+
+.dtp-zone-foot {
+  font-size: 11px;
+  color: var(--sb-text-soft);
+}
+
+.dtp-apply-btn {
+  padding: 6px 14px;
+  min-height: 32px;
+  border: 0;
+  background: var(--sb-accent);
+  color: var(--sb-white);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dtp-apply-btn:hover {
+  background: var(--sb-green);
+}
+
+/* Timezone Switcher Popover List */
+.tz-search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--sb-hairline);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--sb-text);
+  background: var(--sb-neutral-cool);
+}
+
+.tz-search-input:focus {
+  outline: none;
+  border-color: var(--sb-accent);
+}
+
+.tz-zone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 290px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.tz-zone-item {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--sb-hairline);
+  background: var(--sb-white);
+  color: var(--sb-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+}
+
+.tz-zone-item:hover {
+  border-color: var(--sb-accent);
+  background: var(--sb-neutral-cool);
+}
+
+.tz-zone-item.active {
+  background: var(--sb-green-light);
+  border-color: var(--sb-green);
+  color: var(--sb-house);
+}
+
+.tz-zone-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tz-zone-name strong {
+  font-size: 12px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tz-zone-name small {
+  font-size: 11px;
+  color: var(--sb-text-soft);
+}
+
+.tz-zone-clock {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.tz-zone-clock strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sb-house);
+}
+
+.tz-zone-clock small {
+  font-size: 10px;
+  color: var(--sb-text-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-clock-dot,
+  .tz-ticker-dot {
+    animation: none !important;
+  }
+}
